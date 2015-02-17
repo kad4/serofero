@@ -5,8 +5,9 @@ from bs4 import BeautifulSoup
 
 import extractor
 
-categories=[{'name':'business','value':2,'page':31},
-            {'name':'sports','value':3,'page':23},
+categories=[{'name':'world','value':27,'page':1},
+            {'name':'business','value':2,'page':1},
+            {'name':'sports','value':3,'page':1},
             {'name':'news','value':10,'page':1}]
 
 for category in categories:
