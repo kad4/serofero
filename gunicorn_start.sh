@@ -3,8 +3,8 @@
 NAME="serofero" # Name of the application
 DJANGODIR=/home/diwas/serofero # Django project directory
 BINDIP=127.0.0.1:8000 # bind gunicorn to this IP address
-USER=diwas # the user to run as
-GROUP=sudo # the group to run as
+USER=root # the user to run as
+GROUP=root # the group to run as
 NUM_WORKERS=3 # how many worker processes should Gunicorn spawn
 DJANGO_SETTINGS_MODULE=serofero.settings # which settings file should Django use
 DJANGO_WSGI_MODULE=serofero.wsgi # WSGI module name
