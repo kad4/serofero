@@ -20,7 +20,9 @@ def getContent(url):
 
         # Format to use
         if(parsedURL.netloc=="www.onlinekhabar.com"):
-            paragraphs=soup.find_all('p',style="text-align: justify;")
+            soup=soup.find('div',id='sing_left')
+            soup.find('div',id='comments').decompose()
+            paragraphs=soup.find_all('p')
             content=""
             for item in paragraphs:
                 if (item.string):
