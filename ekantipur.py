@@ -54,7 +54,7 @@ for category in categories:
 
                     # Saving content to file
                     if(content):
-                        file=open(filepath,'w')
+                        file=open(filepath,encoding='utf-8',mode='w')
                         file.write(content)
                         file.close()
         category['page']=category['page']+1
