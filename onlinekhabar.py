@@ -52,7 +52,6 @@ for category in categories:
                 # Checking if the file exists
                 if (not(os.path.isfile(filepath))):
                     content=extractor.getContent(link['href'])
-                    print(content)
 
                     # Saving content to file
                     if(content):
