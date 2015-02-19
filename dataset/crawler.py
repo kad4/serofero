@@ -102,7 +102,6 @@ if (__name__=='__main__'):
                 elif(site[2]):
                     soup=BeautifulSoup(response.text).find('ul',class_='news_list')
                     links=list(set(soup.select('li > a')))
-                    print(links)
                 
                 # Break if no links are found
                 if(len(links)==0):
