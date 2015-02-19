@@ -44,10 +44,10 @@ if (__name__=='__main__'):
                 {'name':'news','value':10,'page':1}]
 
         elif(site[2]):
-            categories=[{'name':'raajneeti','page':1},
-                {'name':'samaj','page':1},
-                {'name':'bajar','page':1},
-                {'name':'khel','page':1},]
+            categories=[{'name':'bajar','page':1,'maxpage':29},
+                {'name':'khel','page':1,'maxpage':39},
+                {'name':'samaj','page':1,'maxpage':185},
+                {'name':'raajneeti','page':1,'maxpage':286},]
 
     for category in categories:
 
@@ -137,3 +137,7 @@ if (__name__=='__main__'):
 
             # Increase the page count
             category['page']=category['page']+1
+
+            if(site[2]):
+                if(category['page']>category['maxpage']):
+                    break;
