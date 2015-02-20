@@ -59,13 +59,13 @@ if (__name__=='__main__'):
         
         elif(site[3]):
             categories=[
-                {'name':'health','page':0,'maxpage':11,'skip':14},
-                {'name':'world','page':0,'maxpage':64,'skip':14},
-                {'name':'entertainment','page':0,'maxpage':572,'skip':9},
-                {'name':'sports','page':0,'maxpage':273,'skip':14},
-                {'name':'economy','page':0,'maxpage':289,'skip':14},
-                {'name':'politics','page':0,'maxpage':482,'skip':14},
-                {'name':'society','page':0,'maxpage':572,'skip':14},
+                {'name':'health','page':0,'maxpage':10,'skip':14},
+                {'name':'world','page':0,'maxpage':63,'skip':14},
+                {'name':'entertainment','page':0,'maxpage':571,'skip':9},
+                {'name':'sports','page':0,'maxpage':272,'skip':14},
+                {'name':'economy','page':0,'maxpage':288,'skip':14},
+                {'name':'politics','page':0,'maxpage':481,'skip':14},
+                {'name':'society','page':0,'maxpage':571,'skip':14},
                 ]
 
     for category in categories:
