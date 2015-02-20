@@ -2,6 +2,7 @@ Django==1.7.4
 beautifulsoup4==4.2.1
 chardet==2.0.1
 colorama==0.2.5
+gunicorn==19.2.1
 html5lib==0.999
 lxml==3.3.3
 requests==2.2.1
