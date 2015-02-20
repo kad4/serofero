@@ -12,13 +12,15 @@ if (__name__=='__main__'):
         sys.exit(0)
     else:
         site_str=sys.argv[1]
-        site=[False,False,False]
+        site=[False,False,False,False]
         if(site_str=='onlinekhabar'):
             site[0]=True
         elif(site_str=='ekantipur'):
             site[1]=True
         elif(site_str=='setopati'):
             site[2]=True
+        elif(site_str=='nagariknews'):
+            site[3]=True
         else:
             print('Wrong site entered')
             sys.exit(0)
@@ -28,26 +30,43 @@ if (__name__=='__main__'):
         
         # Categories for individual sites
         if(site[0]):
-            categories=[{'name':'technology','page':1},
+            categories=[
+                {'name':'technology','page':1},
                 {'name':'ent-news','page':1},
                 {'name':'bank','page':1},
                 {'name':'tourism','page':1},
                 {'name':'rojgar','page':1},
                 {'name':'auto','page':1},
                 {'name':'sports','page':1},
-                {'name':'news','page':1},]
+                {'name':'news','page':1},
+                ]
 
         elif(site[1]):
-            categories=[{'name':'world','value':27,'page':1},
+            categories=[
+                {'name':'world','value':27,'page':1},
                 {'name':'business','value':2,'page':1},
                 {'name':'sports','value':3,'page':1},
-                {'name':'news','value':10,'page':1}]
+                {'name':'news','value':10,'page':1},
+                ]
 
         elif(site[2]):
-            categories=[{'name':'bajar','page':1,'maxpage':29},
+            categories=[
+                {'name':'bajar','page':1,'maxpage':29},
                 {'name':'khel','page':1,'maxpage':39},
                 {'name':'samaj','page':1,'maxpage':185},
-                {'name':'raajneeti','page':1,'maxpage':286},]
+                {'name':'raajneeti','page':1,'maxpage':286},
+                ]
+        
+        elif(site[3]):
+            categories=[
+                {'name':'health','page':0,'maxpage':11,'skip':14},
+                {'name':'world','page':0,'maxpage':64,'skip':14},
+                {'name':'entertainment','page':0,'maxpage':572,'skip':9},
+                {'name':'sports','page':0,'maxpage':273,'skip':14},
+                {'name':'economy','page':0,'maxpage':289,'skip':14},
+                {'name':'politics','page':0,'maxpage':482,'skip':14},
+                {'name':'society','page':0,'maxpage':572,'skip':14},
+                ]
 
     for category in categories:
 
@@ -64,6 +83,8 @@ if (__name__=='__main__'):
             base_url='http://www.ekantipur.com/np/category/{0}/page/{1}/'
         elif(site[2]):
             base_url='http://www.setopati.com/{0}/page/{1}/'
+        elif(site[3]):
+            base_url='http://www.nagariknews.com/{0}.html?start={1}'
         
         while(True):
             # Format for the url containing articles list
@@ -75,11 +96,15 @@ if (__name__=='__main__'):
                 url=base_url.format(category['value'],category['page'])
             elif(site[2]):
                 url=base_url.format(category['name'],category['page'])
+            elif(site[3]):
+                url=base_url.format(category['name'],category['page']*category['skip'])
 
             print('\nCurrent Page: ',url)
 
             try:
-                response  = requests.get(url, headers={'User-agent': 'Mozilla/5.0'})
+                # User-agent to use
+                user_agent = {'User-agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'}
+                response  = requests.get(url, headers = user_agent)
                 response.encoding = 'utf-8'
                 response.raise_for_status()
             except requests.exceptions.ConnectionError:
@@ -102,6 +127,11 @@ if (__name__=='__main__'):
                 elif(site[2]):
                     soup=BeautifulSoup(response.text).find('ul',class_='news_list')
                     links=list(set(soup.select('li > a')))
+                elif(site[3]):
+                    soup=BeautifulSoup(response.text).find('div',class_='itemList')
+                    links=soup.select('h1 > a')
+                    for link in links:
+                        link['href']='http://www.nagariknews.com'+link['href']
                 
                 # Break if no links are found
                 if(len(links)==0):
@@ -122,6 +152,8 @@ if (__name__=='__main__'):
                         filename=parseurl.path.split('/')[6].split('.')[0]+'.txt'
                     elif(site[2]):
                         filename=parseurl.path.split('/')[2]+'.txt'
+                    elif(site[3]):
+                        filename=parseurl.path.split('/')[3].split('.')[0]+'.txt'
 
                     filepath=base_path+'/'+filename
 
@@ -138,6 +170,7 @@ if (__name__=='__main__'):
             # Increase the page count
             category['page']=category['page']+1
 
-            if(site[2]):
+            if(site[2] or site[3]):
                 if(category['page']>category['maxpage']):
                     break;
+
