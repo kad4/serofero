@@ -61,10 +61,10 @@ if (__name__=='__main__'):
             categories=[
                 {'name':'health','page':0,'maxpage':10,'skip':14},
                 {'name':'world','page':0,'maxpage':63,'skip':14},
-                {'name':'entertainment','page':0,'maxpage':571,'skip':9},
                 {'name':'sports','page':0,'maxpage':272,'skip':14},
                 {'name':'economy','page':0,'maxpage':288,'skip':14},
                 {'name':'politics','page':0,'maxpage':481,'skip':14},
+                {'name':'entertainment','page':0,'maxpage':571,'skip':9},
                 {'name':'society','page':0,'maxpage':571,'skip':14},
                 ]
 
@@ -134,7 +134,7 @@ if (__name__=='__main__'):
                         link['href']='http://www.nagariknews.com'+link['href']
                 
                 # Break if no links are found
-                if(len(links)==0):
+                if(not(links)):
                     break
                 
                 # Visit individual links
@@ -147,13 +147,13 @@ if (__name__=='__main__'):
                     # Getting file name for article
                     filename=''
                     if(site[0]):
-                        filename=parseurl.path.split('/')[3]+'.txt'
+                        filename=parseurl.path.split('/')[-2]+'.txt'
                     elif(site[1]):
-                        filename=parseurl.path.split('/')[6].split('.')[0]+'.txt'
+                        filename=parseurl.path.split('/')[-1].split('.')[0]+'.txt'
                     elif(site[2]):
-                        filename=parseurl.path.split('/')[2]+'.txt'
+                        filename=parseurl.path.split('/')[-2]+'.txt'
                     elif(site[3]):
-                        filename=parseurl.path.split('/')[3].split('.')[0]+'.txt'
+                        filename=parseurl.path.split('/')[-1].split('.')[0]+'.txt'
 
                     filepath=base_path+'/'+filename
 
