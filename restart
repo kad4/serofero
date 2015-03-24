@@ -1,4 +1,0 @@
-#!/bin/bash
-sudo supervisorctl stop gunicorn
-sudo supervisorctl start gunicorn
-

@@ -1,4 +1,11 @@
 #!/bin/bash
+
+sudo killall gunicorn
+
+git reset --hard HEAD
+git pull
+
+python3 manage.py migrate
  
 NAME="serofero" # Name of the application
 DJANGODIR=/home/diwas/serofero # Django project directory
