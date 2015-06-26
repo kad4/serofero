@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_8r3j05nab1jrrg7+=c##yoafm1@cr+j^$+p8$k_)mr+z!^i3#'
+SECRET_KEY = 'f=)4z21_s=n0rk%c561whuxauk65$d8zdjc4z@4!4jeeq9o%s9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -26,6 +26,19 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+MEDIA_URL = '/media/'
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
+STATIC_PATH = os.path.join(BASE_DIR, 'static')
+
+TEMPLATE_DIRS = [
+    TEMPLATE_PATH,
+]
+
+STATICFILES_DIRS = [
+    STATIC_PATH,
+]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Application definition
 
@@ -36,6 +49,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'sf',
 )
 
 MIDDLEWARE_CLASSES = (
