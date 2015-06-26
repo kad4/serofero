@@ -1,0 +1,32 @@
+{% extends "sf/base.html" %}
+
+{% load staticfiles %}
+
+{% block 'title' %}Index{% endblock 'title' %}
+
+{% block 'body' %}
+
+{% if pages %}
+<div id="sidebar" class="clearfloat">
+    {% for page in pages %}
+    <a href="{% url 'page' page.id%}">
+        <div id="sidebar-item">
+        <div>
+            {# img #} Image is displayed here
+        </div>
+        <div>
+            {# content #} Content goes here
+        </div>
+        </div>
+    </a>
+    {% endfor %} {% endif %}
+</div>
+<div id="front-list">
+    <h3 class="cat_title"><a href="#">Health and Hygiene</a> &raquo;</h3>
+    <span class="title"><a href="#">Elittemper mollisis ut maecenas</a></span>
+    <br/>
+    <span class="meta">[2 May 2008 | <a href="#">No Comment</a> | 153 views]</span>
+    <p><img class="alignleft size-full wp-image-41" style="float: left;" src="img/thumbs/hygene.jpg" alt="" width="180" height="197" />Gravidaestibulus purus ac justo condimentesque vel vitae condimentumsan vivamus non arcu. Habitudinat ut dapibulum semper laculis dui ac vel consectetuer ames elit. Fringdonec consequam ac faucibus felit nibh cras condimentum metuer quisque quismodo. Acsemper alique ut convallis quat facilis lor hendimentesque sus trisus eu. Gravidavitae amet dolor estas phasellus dolor eleris.</p>
+    <p> <a href="#" class="more-link">Read the full story &raquo;</a></p>
+</div>
+{% endblock 'body' %}

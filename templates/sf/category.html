@@ -1,0 +1,26 @@
+{% extends "sf/base.html" %}
+
+{% load staticfiles %}
+
+{% block 'title' %} {{category.name}} {% endblock 'title' %}
+
+{% block 'body' %}
+	{% if pages %}
+    <div id='card'>
+		{% for page in pages %}
+		<a href="{% url 'page' page.id%}">
+	        <div id="card-item">
+		        {% if forloop.counter|divisibleby:2 %}
+		        <div class='image-placeholder'>Image Appears Here</div>
+		        <div class='content-placeholder'>{{page.title}}</div>
+		        {% else %}
+		        <div class='content-placeholder'>{{page.title}}</div>
+		        <div class='image-placeholder'>Image Appears Here</div>
+		        {% endif %}
+	        </div>
+		</a>
+		{% empty %}
+		{% endfor %}
+    </div>
+	{% endif %}
+{% endblock 'body' %}
