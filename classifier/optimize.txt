@@ -1,0 +1,104 @@
+Obtaining files
+Selecting relevant stems
+Computing tf-idf
+Training SVM
+Predicting class
+news
+Time: 51.43762993812561
+Wrote profile results to classifier.py.lprof
+Timer unit: 1e-06 s
+
+Total time: 11.3829 s
+File: classifier.py
+Function: select_stems at line 57
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    57                                               @profile
+    58                                               def select_stems(self):
+    59         1            3      3.0      0.0          stems_dict={}
+    60                                           
+    61      1001         7526      7.5      0.1          for doc in random.sample(self.documents,self.docs_size):
+    62                                           
+    63      1000       269769    269.8      2.4              file=open(doc['path'],'r')
+    64      1000      1097487   1097.5      9.6              content=file.read()
+    65      1000        27594     27.6      0.2              file.close()
+    66                                           
+    67                                                       # Obtain known stems
+    68      1000      9625368   9625.4     84.6              known_stems=stemmer.get_known_stems(content)
+    69                                           
+    70                                                       # Add the count of stems
+    71    134211       128506      1.0      1.1              for stem in known_stems:
+    72    133211       188438      1.4      1.7                  stems_dict[stem]=stems_dict.get(stem,0)+1
+    73                                           
+    74                                                   # Maintains the order of insertion during iteration
+    75         1        38168  38168.0      0.3          self.count_vector=OrderedDict(sorted(stems_dict.items(), key=itemgetter(1), reverse=True)[:self.max_stems])
+    76         1            6      6.0      0.0          self.stems_size=len(self.count_vector)
+
+Total time: 22.1449 s
+File: classifier.py
+Function: compute_tfidf at line 78
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    78                                               @profile
+    79                                               def compute_tfidf(self):
+    80                                                    # tf matrix
+    81         1           40     40.0      0.0          tf_matrix=np.ndarray((self.docs_size,self.stems_size),dtype='float16')
+    82                                           
+    83                                                   # Training matrix
+    84         1           12     12.0      0.0          train_matrix=np.ndarray((self.docs_size,self.stems_size),dtype='float16')
+    85         1            6      6.0      0.0          output_matrix=np.ndarray((self.docs_size,1),dtype='float16')
+    86                                           
+    87         1            2      2.0      0.0          occur_dict={}
+    88         1            2      2.0      0.0          init_doc_vector={}
+    89                                           
+    90      6062        16944      2.8      0.1          for stem in self.count_vector:
+    91      6061        12094      2.0      0.1              occur_dict[stem]=0
+    92      6061        11732      1.9      0.1              init_doc_vector[stem]=0
+    93                                           
+    94                                                   # Use a sample of documents
+    95      1001         9011      9.0      0.0          for i,document in enumerate(random.sample(self.documents,self.docs_size)):
+    96                                           
+    97      1000       334633    334.6      1.5              file=open(document['path'],'r')
+    98      1000      1475398   1475.4      6.7              content=file.read()
+    99      1000        32574     32.6      0.1              file.close()
+   100                                           
+   101                                                       # Assign the initial vector
+   102      1000         3556      3.6      0.0              doc_vector=init_doc_vector
+   103                                           
+   104                                                       # Find stems in document
+   105      1000     10470677  10470.7     47.3              doc_stems=stemmer.get_known_stems(content)
+   106                                           
+   107                                                       # Obtain known stems set
+   108      1000        19375     19.4      0.1              known_stems=set(doc_stems)
+   109                                           
+   110                                                       # Add their occurances
+   111      1000         2180      2.2      0.0              max_count=1
+   112     77544       147739      1.9      0.7              for stem in known_stems:
+   113     76544       189615      2.5      0.9                  occur_dict[stem]=occur_dict.get(stem,0)+1
+   114     76544       542876      7.1      2.5                  count=doc_stems.count(stem)            
+   115     76544       153163      2.0      0.7                  doc_vector[stem]=count
+   116     76544       144170      1.9      0.7                  if(count>max_count):
+   117      2906         5489      1.9      0.0                      max_count=count
+   118                                           
+   119                                                       # Compute the tf and append it
+   120      1000      8458747   8458.7     38.2              tf_matrix[i,:]=0.5+0.5/max_count*np.array([doc_vector[stem] for stem in self.count_vector])
+   121                                           
+   122      1000         4963      5.0      0.0              output_matrix[i,0]=document['category_id']
+   123                                           
+   124         1        11937  11937.0      0.1          idf_matrix=np.array([log(self.docs_size/(1+x)) for x in [occur_dict[stem] for stem in self.count_vector]])
+   125                                           
+   126                                                   # Element wise multiplication
+   127      1001         2128      2.1      0.0          for i in range(self.docs_size):
+   128      1000        95861     95.9      0.4              train_matrix[i,:]=tf_matrix[i,:] * idf_matrix
+   129                                           
+   130         1            5      5.0      0.0          self.occur_vector=occur_dict
+   131                                           
+   132                                                   # import pickle
+   133                                                   # pickle.dump(train_matrix,open('dump','wb'))
+   134                                           
+   135                                                   # Storing training data
+   136         1            2      2.0      0.0          self.input_matrix=train_matrix
+   137         1            3      3.0      0.0          self.output_matrix=output_matrix
+
