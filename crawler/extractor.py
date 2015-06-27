@@ -46,14 +46,24 @@ def getContent(url):
            paragraphs=soup.find_all('div')+soup.find_all('p')
            content=''
            for item in paragraphs:
-               if (item.string):
-                   content=content+item.string
+                if (item.string):
+                    content=content+item.string
            return(content)
         
         elif(parsedURL.netloc=='www.nagariknews.com'):
            soup=soup.find('div',class_="itemFullText")
            content=soup.get_text()
            return(content)
+
+        elif(parsedURL.netloc=='www.ratopati.com'):
+            soup=soup.find('div',id='sing_cont')
+            paragraphs=soup.find_all('p')
+            content=''
+            for item in paragraphs:
+                if(item.string):
+                    content=content+item.string
+            return(content)
+          
         else:
             print('Match for the site not found')
 
