@@ -6,27 +6,45 @@
 
 {% block 'body' %}
 
+{% if top_pages %}
+<div id="top" class="clearfloat">
+    <div id="headline">
+        <div class="title"><a href="{{first_page.url}}">{{first_page.title}}</a></div>
+        <div class="meta">{{first_page.pub_date}} | {{first_page.views}} views</div>
+        <a href="#"> <img src="/media/pages/{{first_page.id}}.jpg" alt="" class="left" width="300" height="300" /></a>
+        <p>Semscelerit id habitur orci aenean quis vestas at pede ac orci. Eufamet in aenean sed eu nam morbi dui velis sus phasellus. Insapien condimentum eget habitur orci nullamcorper lacus purus nam eu dapientum. Orcivel tempus quam nam id nullam proin vestique fauctor fuscing quis..</p>
+        <p>Nibhsed dui curabitur mauris tincidunt nam aenean inte ris vel lobortor. Aeneanconsectetus orci auctor ante dui fauctor intesque magna platea dolorem volutpat. Quisquequis ligula elis sed at lor orna nibh velit metuer nisl. Seddis nullamcorper accum alique nullam sce ut tor et condisse senean</p>
+        <a href="#">Read the full story &raquo;</a> </div>
+    <div id="featured"><h3 class="cat_title">Featured</h3>
+        {% for page in top_pages %}
+        <a href="{% url 'page' page.id %}">
+            <div class="clearfloat">
+                <img src="/media/pages/{{page.id}}.jpg" alt="{{page.title}}" class="left" width="100" height="65" /></a>
+                <div class="info"><p class="title">{{page.title}}</p>
+                    <p>Vestibulumsemper augue arcu gravida cursus magna ristique cum auctor libero condimentum.</p>
+                </div>
+            </div>
+        </a>
+        <hr>
+        {% empty %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% if pages %}
-<div id="sidebar" class="clearfloat">
+<div id="bottom" class="clearfloat">
     {% for page in pages %}
-    <a href="{% url 'page' page.id%}">
-        <div id="sidebar-item">
-        <div>
-            {# img #} Image is displayed here
-        </div>
-        <div>
-            {# content #} Content goes here
-        </div>
+    <a href="{% url 'page' page.id %}">
+        <div id="card-item" style="float:left; width:220px; height:170px;">
+            <div class="info"><p id="title" align="center">{{page.title}}</p>
+            <div style="vertical-align: bottom;"><img src="/media/pages/{{page.id}}.jpg" alt="{{page.title}}" width="218" height="65" /></a>
+                <p>Vestibulumsemper augue arcu gravida cursus magna ristique cum auctor libero condimentum.</p>
+            </div>
+            </div>
         </div>
     </a>
-    {% endfor %} {% endif %}
+    {% empty %}
+    {% endfor %}
 </div>
-<div id="front-list">
-    <h3 class="cat_title"><a href="#">Health and Hygiene</a> &raquo;</h3>
-    <span class="title"><a href="#">Elittemper mollisis ut maecenas</a></span>
-    <br/>
-    <span class="meta">[2 May 2008 | <a href="#">No Comment</a> | 153 views]</span>
-    <p><img class="alignleft size-full wp-image-41" style="float: left;" src="img/thumbs/hygene.jpg" alt="" width="180" height="197" />Gravidaestibulus purus ac justo condimentesque vel vitae condimentumsan vivamus non arcu. Habitudinat ut dapibulum semper laculis dui ac vel consectetuer ames elit. Fringdonec consequam ac faucibus felit nibh cras condimentum metuer quisque quismodo. Acsemper alique ut convallis quat facilis lor hendimentesque sus trisus eu. Gravidavitae amet dolor estas phasellus dolor eleris.</p>
-    <p> <a href="#" class="more-link">Read the full story &raquo;</a></p>
-</div>
+{% endif %}
 {% endblock 'body' %}

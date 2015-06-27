@@ -12,20 +12,22 @@
 
 <body>
     <div>
-    <div id="navbar" class="clearfloat">
-        <a href="{% url 'index' %}"><h1>Serofero</h1></a>
-        <form method="get" id="searchform" action="#">
-          <div id="search">
-            <input type="text" value="" name="s" id="s" class="field" />
-            <input type="submit" id="searchsubmit" value="Search" class="button" />
-          </div>
-        </form>
-        {% for category in categories %}
-        <div class="category"><span class="cat_title"><a href="{% url 'category' category.slug %}">{{category.name}}</a></span> </div>
-        {% empty %} {% endfor %}
-    </div>
-    {% block 'body' %} {% endblock 'body' %}
-    <div id="footer"><a href="#">About us</a> | <a href="#">Terms and Conditions</a> | <a href="#">Privacy Policy</a> | <a href="http://www.michaeljubel.com">Copyright (c) 2015</a> </div>
+        <div id="navbar" class="clearfloat">
+            <a href="{% url 'index' %}"><h1>Serofero</h1></a>
+            <form method="get" id="searchform" action="#">
+                <div id="search">
+                    <input type="text" value="" name="s" id="s" class="field" />
+                    <input type="submit" id="searchsubmit" value="Search" class="button" />
+                </div>
+            </form>
+            {% for category in categories %}
+            <div class="category"><span class="cat_title"><a href="{% url 'category' category.slug %}">{{category.name}}</a></span> </div>
+            {% empty %} {% endfor %}
+        </div>
+        <div id="page">
+            {% block 'body' %} {% endblock 'body' %}
+        </div>
+        <footer id="footer"><a href="#">About us</a> | <a href="#">Terms and Conditions</a> | <a href="#">Privacy Policy</a> | <a href="http://www.michaeljubel.com">Copyright (c) 2015</a> </footer>
     </div>
 </body>
 

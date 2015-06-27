@@ -7,9 +7,11 @@ from .models import Category, Page
 
 def index(request):
     category_list = Category.objects.order_by('name')
-    page_list = Page.objects.order_by('pub_date')[:10]
+    page_list = Page.objects.order_by('pub_date')[:8]
+    top_page_list = Page.objects.order_by('views')[:4]
+    first_page = page_list[0]
 
-    context_dict = {'categories': category_list, 'pages': page_list}
+    context_dict = {'categories': category_list, 'pages': page_list, 'top_pages': top_page_list, 'first_page':first_page}
     response = render(request, 'sf/index.html', context_dict)
 
     return response
