@@ -23,7 +23,7 @@ class doc_classifier():
 
         # Size of training matrix
         self.docs_size=1000
-        self.max_stems=7000
+        self.max_stems=5000
         self.stems_size=0
 
         # Occurences and count vector for stems
@@ -37,6 +37,7 @@ class doc_classifier():
         # Assign a SVM classifier
         self.clf=svm.SVC()
 
+    # Obtain the filenames and categories
     def get_files(self):
         _documents=[]
 
@@ -54,6 +55,7 @@ class doc_classifier():
         self.documents=_documents
         self.total_doc=len(_documents)
 
+    # Obtain relevant stems
     def select_stems(self):
         stems_dict={}
 
@@ -74,6 +76,7 @@ class doc_classifier():
         self.count_vector=OrderedDict(sorted(stems_dict.items(), key=itemgetter(1), reverse=True)[:self.max_stems])
         self.stems_size=len(self.count_vector)
 
+    # Computes the tf-idf matrix
     def compute_tfidf(self):
          # tf matrix
         tf_matrix=np.ndarray((self.docs_size,self.stems_size),dtype='float16')

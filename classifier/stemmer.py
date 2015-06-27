@@ -1,8 +1,7 @@
 import re
 
-# Global variables
+# Global variable
 stems=None
-stems_set=None
 
 suffixes = {
     1: ['छ', 'ा', 'न', 'ए', 'े', 'ी', 'ि', 'ै', 'ई', 'ओ', 'उ'],
@@ -21,23 +20,21 @@ suffixes = {
     7: []
 }
 
+# Read stems from file
 def read_stems():
     # Reads the word stems
     file=open('word_stem.txt')
     lines=file.readlines()
     file.close()
 
-    # Constructing stems list
-    stems=[]
+    # Constructing stems set
+    _stems=set()
     for line in lines:
         new_line=line.replace('\n','')
         stem=new_line.split('|')[0]
-        stems.append(stem)
+        _stems.add(stem)
 
-    # Fastest method to remove duplicate preserving the order
-    seen = set()
-    seen_add = seen.add
-    return([x for x in stems if not (x in seen or seen_add(x))])
+    return(_stems)
 
 # Removes suffix
 def remove_suffix(word):
@@ -67,17 +64,19 @@ def tokenize(text):
 # Returns the stem
 def stem(word):
     word_stem=remove_suffix(word)
-    if(word_stem in stems_set):
+    if(word_stem in stems):
         return word_stem
     else:
         return word
 
+# Returns stems list
 def get_stems(text):
     # Obtain tokens of the text
     tokens=tokenize(text)
 
     return([stem(token) for token in tokens])
 
+# Returns known stems list
 def get_known_stems(text):
     # Obtain tokens of the text
     tokens=tokenize(text)
@@ -86,13 +85,9 @@ def get_known_stems(text):
     stems_list=[stem(token) for token in tokens]
 
     # Returns known stem list
-    return([stem for stem in stems_list if stem in stems_set])
+    return([stem for stem in stems_list if stem in stems])
 
-# Load stem
 stems=read_stems()
-
-# Searching is faster in set
-stems_set=set(stems)
 
 if __name__ == '__main__':
     stems=get__stems("""  पिट्सवर्ग (बीबीसी), कार्तिक २३ - अमरिकाको न्युरोसाइन्टिस्ट ६६ वर्षे रबर्ट फेर्रान्टेलाई पत्नी हत्याको लागि दोषी ठहर 
