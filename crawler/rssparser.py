@@ -26,7 +26,9 @@ class rss_parser():
 			items=items[:3]
 			for item in items:
 				link=item.link.string
-				content=extractor.getContent(link)[:300]
+				content,img_url=extractor.getArticle(url=link,img=True)[:300]
+
+				# Code for images
 
 				article={
 				'title':item.title.string,

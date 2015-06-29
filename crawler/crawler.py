@@ -159,7 +159,7 @@ if (__name__=='__main__'):
 
                     # Checking if the file exists
                     if (not(os.path.isfile(filepath))):
-                        content=extractor.getContent(link['href'])
+                        content=extractor.getArticle(link['href'])[0]
 
                         # Saving content to file
                         if(content):

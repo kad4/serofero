@@ -2,7 +2,7 @@ import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
-def getContent(url):
+def getArticle(url,img=False):
     try:
         response = requests.get(url)
         user_agent = {'User-agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'}
@@ -19,53 +19,55 @@ def getContent(url):
         soup=BeautifulSoup(response.text)
         parsedURL=urlparse(url)
 
+        content=''
+        img_url=''
+
         # Format to use
         if(parsedURL.netloc=='www.onlinekhabar.com'):
             soup=soup.find('div',id='sing_left')
             soup.find('div',id='comments').decompose()
             paragraphs=soup.find_all('p')
-            content=''
-            for item in paragraphs:
-                if (item.string):
-                    content=content+item.string
-            return (content)
+
+            content=''.join([item.string for item in paragraphs if item.string])
+            
+            # Extracting images
+            if(img):
+                img_url=soup.find('img')['src']
 
         elif(parsedURL.netloc=='www.ekantipur.com'):
             soup=soup.find('div',class_='newsContentWrapper')
             paragraphs=soup.find_all('p')
-            content=''
-            for item in paragraphs:
-                if (item.string):
-                    content=content+item.string
-            return (content)
+            
+            content=''.join([item.string for item in paragraphs if item.string])
         
         elif(parsedURL.netloc=='setopati.com'):
            soup=soup.find('div',id='newsbox')
            soup.find('div',class_='fb_like_detail').decompose()
            soup.find('div',class_='comments').decompose()
            paragraphs=soup.find_all('div')+soup.find_all('p')
-           content=''
-           for item in paragraphs:
-                if (item.string):
-                    content=content+item.string
-           return(content)
+
+           content=''.join([item.string for item in paragraphs if item.string])
         
         elif(parsedURL.netloc=='www.nagariknews.com'):
            soup=soup.find('div',class_="itemFullText")
+
            content=soup.get_text()
-           return(content)
 
         elif(parsedURL.netloc=='www.ratopati.com'):
             soup=soup.find('div',id='sing_cont')
             paragraphs=soup.find_all('p')
-            content=''
-            for item in paragraphs:
-                if(item.string):
-                    content=content+item.string
-            return(content)
+
+            content=''.join([item.string for item in paragraphs if item.string])
+
+            # Extracting images
+            if(img):
+                img_url=soup.find('img')['src']
           
         else:
             print('Match for the site not found')
 
+        return([content,img_url])
+
 if __name__ == '__main__':
-    print(getContent('http://www.nagariknews.com/health/story/29987.html'))
+    print(getArticle('http://www.onlinekhabar.com/2015/06/293286/',img=True))
+
