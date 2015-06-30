@@ -1,9 +1,9 @@
 from bs4 import BeautifulSoup
 import requests
 
-import extractor
+from . import extractor
 
-class rss_parser():
+class rssparser():
 	def __init__(self,url=''):
 		if(url==''):
 			self.urls=[

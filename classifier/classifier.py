@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 
-import stemmer
+from . import stemmer
 
 # Categories index
 categories=['business','entertainment','news','politics','sports']
