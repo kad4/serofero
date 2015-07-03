@@ -2,9 +2,6 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from .models import Category, Page
 
-# Create your views here.
-
-
 def index(request):
     category_list = Category.objects.order_by('name')
     page_list = Page.objects.order_by('pub_date')[:8]
@@ -15,7 +12,6 @@ def index(request):
     response = render(request, 'sf/index.html', context_dict)
 
     return response
-
 
 def category(request, category_name_slug):
     try:
@@ -29,7 +25,6 @@ def category(request, category_name_slug):
     response = render(request, 'sf/category.html', context_dict)
 
     return response
-
 
 def page(request, pk):
     try:

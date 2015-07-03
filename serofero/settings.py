@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
@@ -26,19 +25,20 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-MEDIA_URL = '/media/'
 TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates')
-STATIC_PATH = os.path.join(BASE_DIR, 'static')
 
 TEMPLATE_DIRS = [
     TEMPLATE_PATH,
 ]
 
-STATICFILES_DIRS = [
-    STATIC_PATH,
-]
-
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.7/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
 
 # Application definition
 
@@ -69,7 +69,6 @@ ROOT_URLCONF = 'serofero.urls'
 
 WSGI_APPLICATION = 'serofero.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
@@ -92,12 +91,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
-
-STATIC_URL = '/static/'
 
 # Celery configurations
 BROKER_URL = 'django://'
