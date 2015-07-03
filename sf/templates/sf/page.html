@@ -1,0 +1,18 @@
+{% extends "sf/base.html" %}
+
+{% load staticfiles %}
+
+{% block 'title' %}
+{{page.title}}
+{% endblock 'title' %}
+
+{% block 'body' %}
+<script>
+      $("#card-item").load("http://www.w3schools.com");
+      $("#card-item").load("Hello there");
+</script>
+<div id="navbar" class="clearfloat">
+	<center>{{page.title}} | {{page.url}}</center>
+</div>
+<div id="card-item">The Page cannot be displayed</div>
+{% endblock 'body' %}

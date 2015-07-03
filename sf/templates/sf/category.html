@@ -1,0 +1,28 @@
+{% extends "sf/base.html" %}
+
+{% load staticfiles %}
+
+{% block 'title' %} {{category.name}} {% endblock 'title' %}
+
+{% block 'body' %}
+	{% if pages %}
+    <div id='top' class='clearfloat'>
+		{% for page in pages %}
+		<a href="{% url 'page' page.id%}">
+	        <div id="card-item" class='clearfloat' style:'border-style: solid; border-width: 5px; border-color: #efefef'>
+		        {% if forloop.counter|divisibleby:2 %}
+			        <img class="clearfloat" style="float:left" src="/media/pages/{{page.id}}.jpg" alt="{{page.title}}" width="200px" height="200px"></img>
+		        {% else %}
+			        <img class="clearfloat" style="float:right" src="/media/pages/{{page.id}}.jpg" alt="{{page.title}}" width="200px" height="200px"></img>
+		        {% endif %}
+		        <div class='clearfloat'>
+		        	<h2>{{page.title}}</h3>
+		        	<p>Contet goes here</p>
+		        </div>
+	        </div>
+		</a>
+		{% empty %}
+		{% endfor %}
+    </div>
+	{% endif %}
+{% endblock 'body' %}
