@@ -1,8 +1,9 @@
-import requests
 from urllib.parse import urlparse
+
+import requests
 from bs4 import BeautifulSoup
 
-def getArticle(url,img=False):
+def get_article(url,img=False):
     try:
         response = requests.get(url)
         user_agent = {'User-agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'}
@@ -69,5 +70,5 @@ def getArticle(url,img=False):
         return([content,img_url])
 
 if __name__ == '__main__':
-    print(getArticle('http://www.onlinekhabar.com/2015/06/293286/',img=True))
+    print(get_article('http://www.onlinekhabar.com/2015/06/293286/',img=True))
 

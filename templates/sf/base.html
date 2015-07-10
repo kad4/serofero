@@ -2,33 +2,48 @@
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
 
 <head profile="http://gmpg.org/xfn/11">
-    <title>Serofero</title>
+    <title>{% block 'title' %}Serofero{% endblock %}</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="{% static 'sf/css/style.css' %}" type="text/css" />
     <link rel="icon" href="" />
     <link rel="shortcut icon" href="" />
+    <link rel="stylesheet" href="{% static 'sf/css/style.css' %}" type="text/css" />
     <script src="{% static 'sf/js/jquery.js' %}"></script>
 </head>
 
 <body>
     <div>
         <div id="navbar" class="clearfloat">
-            <a href="{% url 'index' %}"><h1>Serofero</h1></a>
+            <h1>
+                <a href="{% url 'index' %}">Serofero</a>
+            </h1>
             <form method="get" id="searchform" action="#">
                 <div id="search">
                     <input type="text" value="" name="s" id="s" class="field" />
                     <input type="submit" id="searchsubmit" value="Search" class="button" />
                 </div>
             </form>
+
             {% for category in categories %}
-            <div class="category"><span class="cat_title"><a href="{% url 'category' category.slug %}">{{category.name}}</a></span> </div>
-            {% empty %} {% endfor %}
+            <div class="category">
+                <span class="cat_title">
+                    <a href="{% url 'category' category.slug %}">{{category.name}}</a>
+                </span>
+            </div>
+            {% empty %} 
+            {% endfor %}
+
         </div>
+
         <div id="page">
-            {% block 'body' %} {% endblock 'body' %}
+            {% block 'body' %}
+            {% endblock 'body' %}
         </div>
+
         <footer id="footer">
-            <a href="#">About us</a> | <a href="#">Terms and Conditions</a> | <a href="#">Privacy Policy</a> | <a href="http://www.michaeljubel.com">Copyright (c) 2015</a> 
+            <a href="#">About us</a> | 
+            <a href="#">Terms and Conditions</a> | 
+            <a href="#">Privacy Policy</a> | 
+            <a href="#">Copyright (c) 2015</a>
         </footer>
     </div>
 </body>

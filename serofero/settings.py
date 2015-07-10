@@ -106,7 +106,7 @@ from celery.schedules import crontab
 
 CELERYBEAT_SCHEDULE = {
     'Obtain new articles every 15 minutes': {
-        'task': 'scheduler.tasks.obtainArticles',
+        'task': 'scheduler.tasks.obtain_articles',
         'schedule': crontab(minute='*/15'),
     },
 }

@@ -1,117 +1,150 @@
+import os
 import random
 import pickle
 from math import log
 from pathlib import Path
+from operator import itemgetter
 
 import numpy as np
+from sklearn import svm
 
-from . import stemmer
+from . stemmer import NepStemmer
+
+stemmer = NepStemmer()
+stemmer.read_stems()
 
 # Categories index
-categories=['business','entertainment','news','politics','sports']
+categories=['business', 'entertainment', 'news', 'politics', 'sports']
 
-class doc_classifier():
+class NepClassifier():
     """ Class to perform the classification of nepali news """
     def __init__(self):
-        self.datapath='data'
-
-        self.documents=[]
+        self.documents = []
+        
+        # Base path to use
+        self.base_path = os.path.dirname(__file__)
 
         # Size of training matrix
-        self.docs_size=1000
-        self.max_stems=4000
-        self.stems_size=0
+        self.docs_size = 2000
+        self.max_stems = 4000
 
         # Stems to use as feature
-        self.stems=None
+        self.stems = None
 
         # Assign a SVM classifier
-        from sklearn import svm
-        self.clf=svm.SVC()
+        self.clf = svm.SVC()
 
+        self.idf_vector = {}
+    
     # Obtain necessary data
-    def loadDocuments(self):
-        for category in Path(self.datapath).iterdir():
+    def load_documents(self):
+        data_path=os.path.join(self.base_path, 'data')
+        for category in Path(data_path).iterdir():
 
             # Convert path to posix notation
-            category_name=category.as_posix().split('/')[1]
+            category_name = category.as_posix().split('/')[-1]
 
             for filepath in category.iterdir():
                 self.documents.append({
-                    'path':filepath.as_posix(),
-                    'category_id':categories.index(category_name)
+                        'path' : filepath.as_posix(),
+                        'category_id' : categories.index(category_name)
                     })
+        
+        self.sample_documents()
+    
+    def sample_documents(self):
+        self.documents=random.sample(self.documents,self.docs_size)
+    
+    # Process the documents
+    def process_documents(self):
+        stems_dict = {}
+        for doc in self.documents:
 
-        # Obtain relevant stems
-        stems_dict={}
-        for doc in random.sample(self.documents,self.docs_size):
-
-            file=open(doc['path'],'r')
-            content=file.read()
+            file = open(doc['path'], 'r')
+            content = file.read()
             file.close()
 
             # Obtain known stems
-            known_stems=stemmer.get_known_stems(content)
+            doc_stems = stemmer.get_known_stems(content)
+            doc_stems_set = set(doc_stems)
 
             # Add the count of stems
-            for stem in known_stems:
-                stems_dict[stem]=stems_dict.get(stem,0)+1
+            for stem in doc_stems:
+                stems_dict[stem] = stems_dict.get(stem,0)+1
+            
+            for stem in doc_stems_set:
+                self.idf_vector[stem] = self.idf_vector.get(stem,0)+1
 
-        from operator import itemgetter
-        stem_tuple=sorted(stems_dict.items(), key=itemgetter(1), reverse=True)[10:self.max_stems+10]
-
-        self.stems=[item[0] for item in stem_tuple]
-
-        self.stems_size=len(self.stems)
-
+        stem_tuple=sorted(
+            stems_dict.items(),
+            key = itemgetter(1),
+            reverse = True
+        )[10 : self.max_stems+10]
+    
+        # Construct a ordered list of stems
+        self.stems = [item[0] for item in stem_tuple]
+        
+        stems_file = os.path.join(self.base_path, 'stems.p')
+        pickle.dump(self.stems, open(stems_file, 'wb'))
+        
+        idf_file = os.path.join(self.base_path, 'idf.p')
+        pickle.dump(self.idf_vector,open(idf_file, 'wb'))
+   
     # Compute tf-idf and train classifier
     def train(self):
+        stems_size=len(self.stems)
+
          # tf matrix
-        tf_matrix=np.ndarray((self.docs_size,self.stems_size),dtype='float16')
+        tf_matrix = np.ndarray(
+            (self.docs_size, stems_size),
+            dtype = 'float16'
+        )
 
         # Training matrix
-        train_matrix=np.ndarray((self.docs_size,self.stems_size),dtype='float16')
-        output_matrix=np.ndarray((self.docs_size,1),dtype='float16')
+        train_matrix = np.ndarray(
+            (self.docs_size, stems_size),
+            dtype='float16'
+        )
 
-        occur_dict={}
-        init_doc_vector={}
-
-        for stem in self.stems:
-            occur_dict[stem]=0
-            init_doc_vector[stem]=0
+        output_matrix=np.ndarray((self.docs_size,1), dtype = 'float16')
 
         # Use a sample of documents
-        for i,document in enumerate(random.sample(self.documents,self.docs_size)):
+        for i,doc in enumerate(self.documents):
 
-            file=open(document['path'],'r')
-            content=file.read()
+            file = open(doc['path'], 'r')
+            content = file.read()
             file.close()
 
-            # Assign the initial vector
-            doc_vector=init_doc_vector
-
             # Find stems in document
-            doc_stems=stemmer.get_known_stems(content)
+            doc_stems = stemmer.get_known_stems(content)
 
             # Obtain known stems set
-            known_stems=set(doc_stems)
+            doc_stems_set = set(doc_stems)
+
+            doc_vector = {}
 
             # Add their occurances
-            max_count=1
-            for stem in known_stems:
-                occur_dict[stem]=occur_dict.get(stem,0)+1
-                count=doc_stems.count(stem)            
-                doc_vector[stem]=count
-                if(count>max_count):
-                    max_count=count
+            max_count = 1
+            for stem in doc_stems_set:
+                count = doc_stems.count(stem)            
+                doc_vector[stem] = count
+                if(count > max_count):
+                    max_count = count 
 
             # Compute the tf and append it
-            tf_matrix[i,:]=0.5+0.5/max_count*np.array([doc_vector[stem] for stem in self.stems])
+            tf_matrix[i, :] = 0.5+0.5/max_count*np.array(
+                [doc_vector.get(stem,0) for stem in self.stems]
+            )
 
-            output_matrix[i,0]=document['category_id']
+            output_matrix[i,0] = doc['category_id']
 
-        self.occur_vector=occur_dict
-        idf_matrix=np.array([log(self.docs_size/(1+x)) for x in [occur_dict[stem] for stem in self.stems]])
+        idf_matrix = np.array(
+            [
+                log(self.docs_size/(1+x)) 
+                for x
+                in [self.idf_vector[stem] for stem in self.stems]
+            ]
+        )
 
         # Element wise multiplication
         for i in range(self.docs_size):
@@ -121,42 +154,31 @@ class doc_classifier():
         self.clf.fit(train_matrix,output_matrix.ravel())
 
         # Dumping extracted data
-        data={
-        'clf':self.clf,
-        'stems':self.stems,
-        'occur_vector':self.occur_vector,
-        }
-
-        pickle.dump(data,open('data.p','wb'))
-
-    # Loads data from file
-    def loadData(self):
-        if(not(self.stems)):
-            data=pickle.load(open('data.p','rb'))
-
-            self.clf=data['clf']
-            self.stems=data['stems']
-            self.occur_vector=data['occur_vector']
-
+        clf_file=os.path.join(self.base_path,'clf.p')
+        pickle.dump(self.clf,open(clf_file,'wb'))
+    
     # Compute tf-idf for a text
-    def tfidfvector(self,text):
-        # Makes sure the data is present
-        self.loadData()
+    def tf_idf_vector(self,text):
+        # Load stems list
+        stems_file = os.path.join(self.base_path, 'stems.p')
+        self.stems = pickle.load(open(stems_file, 'rb'))
+        
+        # Load idf of stems
+        idf_file = os.path.join(self.base_path, 'idf.p')
+        self.idf_vector = pickle.load(open(idf_file, 'rb'))
 
         # Find stems in document
         doc_stems=stemmer.get_known_stems(text)
 
         # Obtain known stems set
-        known_stems=set(doc_stems)
+        doc_stems_set=set(doc_stems)
 
         doc_vector={}
-        for stem in self.stems:
-            doc_vector[stem]=0
 
-        for stem in known_stems:
+        for stem in doc_stems_set:
             doc_vector[stem]=doc_stems.count(stem)
 
-        doc_vector_list=[doc_vector[stem] for stem in self.stems]
+        doc_vector_list=[doc_vector.get(stem,0) for stem in self.stems]
 
         max_count=max(doc_vector_list)
 
@@ -164,25 +186,28 @@ class doc_classifier():
 
         tf_idf_vector=[]
         for i,stem in enumerate(self.stems):
-            tf_idf_vector.append(tf_vector[i]*self.occur_vector[stem])
+            tf_idf_vector.append(tf_vector[i]*self.idf_vector[stem])
 
         return(tf_idf_vector)
 
     # Predict the class
     def predict(self,text):
-        # Makes sure the data is present
-        self.loadData()
-
-        tf_idf_vector=self.tfidfvector(text)
-
-        id=int(round(self.clf.predict(tf_idf_vector)[0]))
-        return (categories[id])
+        tf_idf_vector=self.tf_idf_vector(text)
+        
+        clf_file = os.path.join(self.base_path, 'clf.p')
+        self.clf = pickle.load(open(clf_file, 'rb'))
+        
+        class_id=int(round(self.clf.predict(tf_idf_vector)[0]))
+        return (categories[class_id])
 
 if __name__ == '__main__':
-    var1=doc_classifier()
-    print('Obtaining documents')
-    var1.loadDocuments()
+    var1=NepClassifier()
+    print('Obtaining documents list')
+    var1.load_documents()
 
+    print('Processing documents')
+    var1.process_documents()
+    
     print('Training SVM')
     var1.train()
 
