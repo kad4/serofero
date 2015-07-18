@@ -1,42 +1,42 @@
+from urllib.parse import urlparse
+
 from django.template.defaultfilters import slugify
 from django.db import models
+from django.core.files import File
+from django.core.files.temp import NamedTemporaryFile
 
-class Category(models.Model):
-    name = models.CharField(max_length=128, unique=True)
-    slug = models.SlugField(unique=True)
+import requests
 
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name)
-        super(Category, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return self.name
-
-    class Meta():
-        verbose_name = "Category"
-        verbose_name_plural = "Categories"
-
-class Page(models.Model):
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=80)
-    content = models.CharField(max_length=305)
-    category = models.ForeignKey(Category)
+class Article(models.Model):
+    id = models.AutoField(primary_key = True)
+    title = models.CharField(max_length = 80)
+    content = models.TextField(max_length = 305)
     
     url = models.URLField()
-    views = models.IntegerField(default=0)
-    pub_date = models.DateTimeField(auto_now_add=True)
+    views = models.IntegerField(default = 0)
+    pub_date = models.DateTimeField(auto_now_add = True)
 
-    img_url = models.URLField()
-    image = models.ImageField(upload_to='pages')
+    category = models.CharField(max_length = 20)
+
+    img_url = models.URLField(default = '')
+    image = models.ImageField(upload_to = 'articles')
 
     def __str__(self):
         return self.title
 
     def get_remote_img(self):
-        import requests
-
-        self.image.save(
-            self.id+'.'+img_url.split('.')[-1],
-            requests.get(self.img_url).content
-            )
+        if(self.img_url == ''):
+            return
         
+        # Obtain filename
+        file_name = urlparse(self.img_url).path.split('/')[-1] 
+        
+        # Read image data
+        img_data = requests.get(self.img_url).content
+        
+        # Write the image data in temporary file
+        img_temp = NamedTemporaryFile(delete = True)
+        img_temp.write(img_data)
+        img_temp.flush()
+
+        self.image.save(file_name, File(img_temp))

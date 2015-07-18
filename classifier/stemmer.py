@@ -3,9 +3,9 @@ import os
 
 class NepStemmer():
     def __init__(self):
-        self.stems_set=set()
+        self.stems_set = set()
         
-        self.suffixes={
+        self.suffixes = {
             1: [
                             'छ', 'ा', 'न', 'ए', 'े', 'ी', 'ि', 'ै', 'ई', 'ओ', 'उ'
                 ],
@@ -42,16 +42,16 @@ class NepStemmer():
     # Read stems from file
     def read_stems(self):
         # Reads the word stems
-        script_path=os.path.dirname(__file__)
-        file_path=os.path.join(script_path,'word_stem.txt')
-        file=open(file_path)
-        lines=file.readlines()
+        script_path = os.path.dirname(__file__)
+        file_path = os.path.join(script_path,'word_stem.txt')
+        file = open(file_path)
+        lines = file.readlines()
         file.close()
 
         # Constructing stems set
         for line in lines:
-            new_line=line.replace('\n','')
-            stem=new_line.split('|')[0]
+            new_line = line.replace('\n','')
+            stem = new_line.split('|')[0]
             self.stems_set.add(stem)
 
     # Removes suffix
@@ -68,20 +68,20 @@ class NepStemmer():
     # Tokenizes the given text
     def tokenize(self, text):
         # Removing unnecessary items
-        remove_exp= re.compile("[\d]+")
-        removed_text= remove_exp.sub("",text)
+        remove_exp = re.compile("[\d]+")
+        removed_text = remove_exp.sub("",text)
 
         # Extracting words from text
         # Splits complex combinations in single step
-        extract_exp= re.compile("[\s।|!?.,:;%+\-–*/'‘’“\"()]+")
-        words= extract_exp.split(removed_text)
+        extract_exp = re.compile("[\s।|!?.,:;%+\-–*/'‘’“\"()]+")
+        words = extract_exp.split(removed_text)
 
         # Returns the non-empty items only
         return([word for word in words if word!=''])
 
     # Returns the stem
     def stem(self, word):
-        word_stem=self.remove_suffix(word)
+        word_stem = self.remove_suffix(word)
         if(word_stem in self.stems_set):
             return word_stem
         else:
@@ -90,17 +90,17 @@ class NepStemmer():
     # Returns stems list
     def get_stems(self, text):
         # Obtain tokens of the text
-        tokens=self.tokenize(text)
+        tokens = self.tokenize(text)
 
         return([self.stem(token) for token in tokens])
 
     # Returns known stems list
     def get_known_stems(self, text):
         # Obtain tokens of the text
-        tokens=self.tokenize(text)
+        tokens = self.tokenize(text)
 
         # Obtain the stem list
-        stems_list=[self.stem(token) for token in tokens]
+        stems_list = [self.stem(token) for token in tokens]
 
         # Returns known stem list
         return([stem for stem in stems_list if stem in self.stems_set])

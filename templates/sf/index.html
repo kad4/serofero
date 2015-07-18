@@ -1,55 +1,401 @@
-{% extends "sf/base.html" %}
+{% extends 'sf/base.html' %}
 
 {% load staticfiles %}
 
-{% block 'body' %}
-    <div id="top" class="clearfloat">
-        {% if first_page %}
-        <div id="headline">
-            <div class="title"><a href="{{first_page.url}}">{{first_page.title}}</a></div>
-            <div class="meta">{{first_page.pub_date}} | {{first_page.views}} views</div>
-            <a href="#">
-                <img src="/media/pages/{{first_page.id}}.jpg" alt="" class="left" width="300" height="300" />
-            </a>
-            <p>Semscelerit id habitur orci aenean quis vestas at pede ac orci. Eufamet in aenean sed eu nam morbi dui velis sus phasellus. Insapien condimentum eget habitur orci nullamcorper lacus purus nam eu dapientum. Orcivel tempus quam nam id nullam proin vestique fauctor fuscing quis..</p>
-            <p>Nibhsed dui curabitur mauris tincidunt nam aenean inte ris vel lobortor. Aeneanconsectetus orci auctor ante dui fauctor intesque magna platea dolorem volutpat. Quisquequis ligula elis sed at lor orna nibh velit metuer nisl. Seddis nullamcorper accum alique nullam sce ut tor et condisse senean</p>
-            <a href="#">Read the full story &raquo;</a> 
-        </div>
-        {% endif %}
-        {% if top_pages %}
-        <div id="featured">
-            <h3 class="cat_title">Featured</h3>
-            {% for page in top_pages %}
-            <a href="{% url 'page' page.id %}">
-                <div class="clearfloat">
-                    <img src="/media/pages/{{page.id}}.jpg" alt="{{page.title}}" class="left" width="100" height="65" />
-                    <div class="info">
-                        <p class="title">{{page.title}}</p>
-                        <p>Vestibulumsemper augue arcu gravida cursus magna ristique cum auctor libero condimentum.</p>
-                    </div>
-                </div>
-            </a>
-            <hr>
-            {% empty %}
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
+{% block content %}
+	<div class="content_bottom">
+            <div class="col-lg-8 col-md-8">
+            <!-- start content bottom left -->
+              <div class="content_bottom_left">
+                <div class="single_category wow fadeInDown">
+                  	<h2>                  
+                    	<span class="bold_line"><span></span></span>
+                    	<span class="solid_line"></span>
+                        <a class="title_text" href="#">News</a>
+                  	</h2>
 
-    {% if pages %}
-    <div id="bottom" class="clearfloat">
-        {% for page in pages %}
-        <a href="{% url 'page' page.id %}">
-            <div id="card-item" style="float:left; width:220px; height:170px;">
-                <div class="info"><p id="title" align="center">{{page.title}}</p>
-                <div style="vertical-align: bottom;"><img src="/media/pages/{{page.id}}.jpg" alt="{{page.title}}" width="218" height="65" />
-                <p>Vestibulumsemper augue arcu gravida cursus magna ristique cum auctor libero condimentum.</p>
+	                <div class="business_category_left wow fadeInDown">
+	                    <ul class="fashion_catgnav">
+	                      	<li>
+		                        <div class="catgimg2_container">
+		                        	<a href="{{ news_first.url }}">
+		                        		<img alt="img" src="{{ news_first.image.url}}">
+		                        	</a>
+		                        </div>
+
+		                        <h2 class="catg_titile">
+		                        	<a href="{{ news_first.url }}">{{ news_first.title }}</a>
+		                        </h2>
+
+		                        <div class="comments_box">
+		                          	<span class="meta_date">14/12/2013</span>
+		                          	<span class="meta_comment"><a href="#">No Comments</a></span>
+		                          	<span class="meta_more">
+		                          		<a  href="{{ news_first.url }}">Read More...</a>
+		                          	</span>
+		                        </div>
+
+		                        <p>{{ news_first.content }}</p>
+	                      	</li>
+	                    </ul>
+	                </div>  
+
+	                <div class="business_category_right wow fadeInDown">
+	                    <ul class="small_catg">
+	                    	{% for article in news %}
+		                    <li>
+		                        <div class="media wow fadeInDown">
+			                        <a class="media-left" href="single.html">
+			                        	<img src="{{ article.image.url }}" alt="img">
+			                        </a>
+			                        <div class="media-body">
+			                            <h4 class="media-heading">
+			                            	<a href="#">{{ article.title }}</a>
+			                            </h4> 
+
+			                            <div class="comments_box">
+			                            	<span class="meta_date">14/12/2013</span>
+			                            	<span class="meta_comment"><a href="#">No Comments</a></span>
+			                            </div>
+			                        </div>
+		                        </div>
+		                    </li>
+		                    {% endfor %}
+	                    </ul>
+	                </div>   
                 </div>
-                </div>
+
+                <div class="games_fashion_area">
+                  	<div class="games_category">
+	                    <div class="single_category">
+	                    	<h2>                  
+		                        <span class="bold_line"><span></span></span>
+		                        <span class="solid_line"></span>
+		                        <a class="title_text" href="#">Politics</a>
+	                      	</h2>
+
+	                      	<ul class="fashion_catgnav wow fadeInDown">
+		                        <li>
+		                        	<div class="catgimg2_container">
+		                            	<a href="{{ politics_first.url }}">
+		                            		<img alt="img" src="{{ politics_first.image.url }}">
+		                            	</a>
+		                          	</div>
+
+		                          	<h2 class="catg_titile">
+		                          		<a href="{{ politics_first.url }}">{{ politics_first.title }}</a>
+		                          	</h2>
+
+		                          	<div class="comments_box">
+			                            <span class="meta_date">14/12/2013</span>
+			                            <span class="meta_comment"><a href="#">No Comments</a></span>
+			                            <span class="meta_more"><a  href="#">Read More...</a></span>
+		                          	</div>
+
+		                          	<p>{{ politics_first.content }}</p>
+		                        </li>
+	                      	</ul>
+
+	                      	<ul class="small_catg wow fadeInDown">
+	                      		{% for article in politics %}
+		                        <li>
+		                          	<div class="media">
+			                            <a class="media-left" href="#">
+			                              	<img src="{{ article.image.url }}" alt="img">
+			                            </a>
+			                            <div class="media-body">
+			                              	<h4 class="media-heading">
+			                              		<a href="{{ article.url }}">{{ article.title }}</a>
+			                              	</h4>
+
+			                              	<div class="comments_box">
+				                              	<span class="meta_date">14/12/2013</span>
+				                                <span class="meta_comment"><a href="#">No Comments</a></span>
+			                              	</div>
+			                            </div>
+		                          	</div>
+		                        </li>
+		                        {% endfor %}
+	                      	</ul>
+	                    </div>
+                	</div>
+
+                   <div class="fashion_category">
+                    <div class="single_category">
+                      <div class="single_category wow fadeInDown">
+                        <h2>                  
+                          <span class="bold_line"><span></span></span>
+                          <span class="solid_line"></span>
+                          <a class="title_text" href="category-archive.html">Fashion</a>
+                        </h2>
+                        <ul class="fashion_catgnav wow fadeInDown">
+                          <li>
+                            <div class="catgimg2_container">
+                              <a href="#"><img alt="img" src="img/devhill/390x240x1.jpg"></a>
+                            </div>
+                            <h2 class="catg_titile"><a href="#">Aenean mollis metus sit amet ligula adipiscing</a></h2>
+                            <div class="comments_box">
+                              <span class="meta_date">14/12/2013</span>
+                              <span class="meta_comment"><a href="#">No Comments</a></span>
+                              <span class="meta_more"><a  href="#">Read More...</a></span>
+                            </div>
+                            <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla...</p>
+                          </li>
+                        </ul>
+                        <ul class="small_catg wow fadeInDown">
+                          <li>
+                            <div class="media wow fadeInDown">
+                              <a class="media-left" href="#">
+                                <img src="img/devhill/112x112.jpg" alt="img">
+                              </a>
+                              <div class="media-body">
+                                <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                                <div class="comments_box">
+                                  <span class="meta_date">14/12/2013</span>
+                                  <span class="meta_comment"><a href="#">No Comments</a></span>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li>
+                            <div class="media wow fadeInDown">
+                              <a class="media-left" href="#">
+                                <img src="img/devhill/112x112.jpg" alt="img">
+                              </a>
+                              <div class="media-body">
+                                <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                                <div class="comments_box">
+                                  <span class="meta_date">14/12/2013</span>
+                                  <span class="meta_comment"><a href="#">No Comments</a></span>
+                                </div>
+                              </div>
+                            </div>
+                          </li>                  
+                        </ul>
+                      </div>
+                    </div>
+                  </div><!-- End fashion category -->
+                </div><!-- End games & fashion category --> 
+                <!-- start technology category area -->
+                <div class="technology_catrarea">
+                  <div class="single_category">
+                    <h2>                  
+                      <span class="bold_line"><span></span></span>
+                      <span class="solid_line"></span>
+                      <a class="title_text" href="#">Technology</a>
+                    </h2>
+                    <div class="business_category_left">
+                      <ul class="fashion_catgnav wow fadeInDown">
+                        <li>
+                          <div class="catgimg2_container">
+                            <a href="#"><img alt="img" src="img/devhill/390x240x1.jpg"></a>
+                          </div>
+                          <h2 class="catg_titile"><a href="#">Aenean mollis metus sit amet ligula adipiscing</a></h2>
+                          <div class="comments_box">
+                            <span class="meta_date">14/12/2013</span>
+                            <span class="meta_comment"><a href="#">No Comments</a></span>
+                            <span class="meta_more"><a  href="#">Read More...</a></span>
+                          </div>
+                          <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla...</p>
+                        </li>
+                      </ul>
+                    </div>  
+                    <div class="business_category_right">
+                      <ul class="small_catg wow fadeInDown">
+                        <li>
+                          <div class="media wow fadeInDown">
+                            <a class="media-left" href="#">
+                              <img src="img/devhill/112x112.jpg" alt="img">
+                            </a>
+                            <div class="media-body">
+                              <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                              <div class="comments_box">
+                                <span class="meta_date">14/12/2013</span>
+                                <span class="meta_comment"><a href="#">No Comments</a></span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li>
+                          <div class="media wow fadeInDown">
+                            <a class="media-left" href="#">
+                              <img src="img/devhill/112x112.jpg" alt="img">
+                            </a>
+                            <div class="media-body">
+                              <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                              <div class="comments_box">
+                                <span class="meta_date">14/12/2013</span>
+                                <span class="meta_comment"><a href="#">No Comments</a></span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li>
+                          <div class="media wow fadeInDown">
+                            <a class="media-left" href="#">
+                              <img src="img/devhill/112x112.jpg" alt="img">
+                            </a>
+                            <div class="media-body">
+                              <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                              <div class="comments_box">
+                                <span class="meta_date">14/12/2013</span>
+                                <span class="meta_comment"><a href="#">No Comments</a></span>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>   
+                  </div>
+                </div><!-- End technology category area -->
+              </div><!--End content_bottom_left-->                 
             </div>
-        </a>
-        {% empty %}
-        {% endfor %}
-    </div>
-    {% endif %}
-{% endblock 'body' %}
+            <!-- start content bottom right -->
+            <div class="col-lg-4 col-md-4">
+              <div class="content_bottom_right">
+                <!-- start single bottom rightbar -->
+                <div class="single_bottom_rightbar">
+                  <h2>Recent Post</h2>
+                  <ul class="small_catg popular_catg wow fadeInDown">
+                    <li>
+                      <div class="media wow fadeInDown">
+                        <a href="#" class="media-left">
+                          <img alt="img" src="img/devhill/112x112.jpg">
+                        </a>
+                        <div class="media-body">
+                          <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                          <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                        </div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="media wow fadeInDown">
+                        <a href="#" class="media-left">
+                          <img alt="img" src="img/devhill/112x112.jpg">
+                        </a>
+                        <div class="media-body">
+                          <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                         <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                        </div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="media wow fadeInDown">
+                        <a href="#" class="media-left">
+                          <img alt="img" src="img/devhill/112x112.jpg">
+                        </a>
+                        <div class="media-body">
+                          <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                          <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div> <!-- End single bottom rightbar -->
+                <!-- start single bottom rightbar -->
+                <div class="single_bottom_rightbar">
+                  <ul role="tablist" class="nav nav-tabs custom-tabs">
+                    <li class="active" role="presentation"><a data-toggle="tab" role="tab" aria-controls="home" href="#mostPopular">Most Popular</a></li>
+                    <li role="presentation"><a data-toggle="tab" role="tab" aria-controls="messages" href="#recentComent">Recent Comment</a></li>
+                  </ul>
+                  <div class="tab-content">
+                  <div id="mostPopular" class="tab-pane fade in active" role="tabpanel">
+                    <ul class="small_catg popular_catg wow fadeInDown">
+                      <li>
+                        <div class="media wow fadeInDown">
+                          <a class="media-left" href="#">
+                            <img src="img/devhill/112x112.jpg" alt="img">
+                          </a>
+                          <div class="media-body">
+                            <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                            <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="media wow fadeInDown">
+                          <a class="media-left" href="#">
+                            <img src="img/devhill/112x112.jpg" alt="img">
+                          </a>
+                          <div class="media-body">
+                            <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                           <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="media wow fadeInDown">
+                          <a class="media-left" href="#">
+                            <img src="img/devhill/112x112.jpg" alt="img">
+                          </a>
+                          <div class="media-body">
+                            <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                            <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <div id="recentComent" class="tab-pane fade" role="tabpanel">
+                     <ul class="small_catg popular_catg">
+                      <li>
+                        <div class="media wow fadeInDown">
+                          <a class="media-left" href="#">
+                            <img src="img/devhill/112x112.jpg" alt="img">
+                          </a>
+                          <div class="media-body">
+                            <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                            <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="media wow fadeInDown">
+                          <a class="media-left" href="#">
+                            <img src="img/devhill/112x112.jpg" alt="img">
+                          </a>
+                          <div class="media-body">
+                            <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                           <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                          </div>
+                        </div>
+                      </li>
+                      <li>
+                        <div class="media wow fadeInDown">
+                          <a class="media-left" href="#">
+                            <img src="img/devhill/112x112.jpg" alt="img">
+                          </a>
+                          <div class="media-body">
+                            <h4 class="media-heading"><a href="#">Duis condimentum nunc pretium lobortis </a></h4> 
+                            <p>Nunc tincidunt, elit non cursus euismod, lacus augue ornare metus, egestas imperdiet nulla nisl quis mauris. Suspendisse a pharetra </p>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>                                   
+                </div>
+              </div> <!-- End single bottom rightbar -->
+               <div class="single_bottom_rightbar">
+                <h2>Blog Archive</h2>
+                <div class="blog_archive wow fadeInDown">
+                   <form>
+                     <select>
+                       <option value="">Blog Archive</option>
+                       <option value="">October(20)</option>
+                     </select>
+                   </form>
+                 </div>
+              </div>
+              <div class="single_bottom_rightbar wow fadeInDown">
+                <h2>Popular Lnks</h2>
+                <ul>
+                  <li><a href="#">Blog</a></li>
+                  <li><a href="#">Blog Home</a></li>
+                  <li><a href="#">Error Page</a></li>
+                  <li><a href="#">Social link</a></li>
+                  <li><a href="#">Login</a></li>                  
+                </ul>
+              </div>
+            </div>
+          </div>
+{% endblock %}

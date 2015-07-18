@@ -1,30 +1,23 @@
 from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404
 
-from .models import Category, Page
-
-from classifier.classifier import categories
-
-category_list = categories
+from .models import Article
 
 def index(request):
-    page_list = Page.objects.order_by('pub_date')[:8]
-    top_page_list = Page.objects.order_by('views')[:4]
-    first_page = page_list[0]
+	news = Article.objects.filter(category = 'news')[:6]
+	news_first = news[0]
+	news = news[1:6]
 
-    context_dict = {'categories': category_list, 'pages': page_list, 'top_pages': top_page_list, 'first_page':first_page}
-    return render(request, 'sf/index.html', context_dict)
+	politics = Article.objects.filter(category = 'politics')[:6]
+	politics_first = politics[0]
+	politics = politics[1:6]
 
-def category(request, category_name_slug):
-    category=get_object_or_404(Category, slug=category_name_slug)
+	content_dict = {
+		'news_first' : news_first,
+		'news' : news,
 
-    page_list = Page.objects.filter(category=category).order_by('pub_date')
+		'politics' : politics,
+		'politics_first' : politics_first,
+	}
 
-    context_dict = {'category': category, 'pages': page_list, 'categories':category_list}
-    return render(request, 'sf/category.html', context_dict)
-
-def page(request, pk):
-    page=get_object_or_404(Page, id=pk)
-
-    context_dict = {'page': page, 'categories':category_list}
-    return render(request, 'sf/page.html', context_dict)
+	return render(request, 'sf/index.html', content_dict)

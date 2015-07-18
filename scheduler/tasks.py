@@ -3,29 +3,32 @@ import time
 import requests
 from celery import shared_task
 
-from sf.models import Page,Category
-from classifier import classifier
+from sf.models import Article
+from classifier.classifier import NepClassifier
 from .parser import RSSParser
 
 @shared_task
 def obtain_articles():
-	parser=rssparser()
-	articles=parser.get_articles()
+    parser = RSSParser()
+    print('Parsing RSS')
+    articles = parser.get_articles()
 
-	nep_classifer=classifier.NepClassifier()
-	nep_classifer.load_data()
+    clf = NepClassifier()
+    clf.load_data()
+    clf.load_clf()
 
-	for article in articles:
-		p=Page.objects.create(
-			title=article['title'],
-			pub_date=time.strptime(article['date'],
-                            '%m/%d/%Y %I:%M %p')
-			url=article['link'],
-			content=article['content'][:300],
-			category=None,
-		)
+    for article in articles:
+        category = clf.predict(article['content'])
 
-		# Download and save image
-		p.get_remote_img()
-		
-		p.save()
+        obj = Article.objects.create(
+                title = article['title'],
+                url = article['link'],
+                content = article['content'][:300],
+                img_url = article['img_url'],
+                category = category
+        )
+
+        # Download and save image
+        obj.get_remote_img()
+        
+        obj.save()

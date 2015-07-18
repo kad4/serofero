@@ -38,7 +38,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR,'static')
+STATIC_ROOT = os.path.join(BASE_DIR,'staticdeploy')
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
 # Application definition
 
@@ -107,6 +111,6 @@ from celery.schedules import crontab
 CELERYBEAT_SCHEDULE = {
     'Obtain new articles every 15 minutes': {
         'task': 'scheduler.tasks.obtain_articles',
-        'schedule': crontab(minute='*/15'),
+        'schedule': crontab(minute='*'),
     },
 }

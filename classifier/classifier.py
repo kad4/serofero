@@ -13,9 +13,6 @@ from . stemmer import NepStemmer
 stemmer = NepStemmer()
 stemmer.read_stems()
 
-# Categories index
-categories=['business', 'entertainment', 'news', 'politics', 'sports']
-
 class NepClassifier():
     """ Class to perform the classification of nepali news """
     def __init__(self):
@@ -31,29 +28,36 @@ class NepClassifier():
         # Stems to use as feature
         self.stems = None
 
-        # Assign a SVM classifier
-        self.clf = svm.SVC()
+        # Categories
+        self.categories = []
+
+        # Classifier
+        self.clf = None
 
         self.idf_vector = {}
     
     # Obtain necessary data
     def load_documents(self):
-        data_path=os.path.join(self.base_path, 'data')
+        data_path = os.path.join(self.base_path, 'data')
+        category_id = 0
+
         for category in Path(data_path).iterdir():
 
             # Convert path to posix notation
             category_name = category.as_posix().split('/')[-1]
+            self.categories.append(category_name)
 
             for filepath in category.iterdir():
                 self.documents.append({
                         'path' : filepath.as_posix(),
-                        'category_id' : categories.index(category_name)
+                        'category_id' : category_id
                     })
+            category_id += 1
         
         self.sample_documents()
     
     def sample_documents(self):
-        self.documents=random.sample(self.documents,self.docs_size)
+        self.documents = random.sample(self.documents,self.docs_size)
     
     # Process the documents
     def process_documents(self):
@@ -84,15 +88,18 @@ class NepClassifier():
         # Construct a ordered list of stems
         self.stems = [item[0] for item in stem_tuple]
         
-        stems_file = os.path.join(self.base_path, 'stems.p')
-        pickle.dump(self.stems, open(stems_file, 'wb'))
+        data = {
+            'categories': self.categories,
+            'stems' : self.stems,
+            'idf_vector' : self.idf_vector
+        }
         
-        idf_file = os.path.join(self.base_path, 'idf.p')
-        pickle.dump(self.idf_vector,open(idf_file, 'wb'))
+        data_file = os.path.join(self.base_path, 'data.p')
+        pickle.dump(data, open(data_file, 'wb'))
    
     # Compute tf-idf and train classifier
     def train(self):
-        stems_size=len(self.stems)
+        stems_size = len(self.stems)
 
          # tf matrix
         tf_matrix = np.ndarray(
@@ -106,7 +113,7 @@ class NepClassifier():
             dtype='float16'
         )
 
-        output_matrix=np.ndarray((self.docs_size,1), dtype = 'float16')
+        output_matrix = np.ndarray((self.docs_size,1), dtype = 'float16')
 
         # Use a sample of documents
         for i,doc in enumerate(self.documents):
@@ -148,43 +155,50 @@ class NepClassifier():
 
         # Element wise multiplication
         for i in range(self.docs_size):
-            train_matrix[i,:]=tf_matrix[i,:] * idf_matrix
+            train_matrix[i,:] = tf_matrix[i,:] * idf_matrix
 
-        # Train the SVM
+        # Assign and train a SVM
+        self.clf = svm.SVC()
         self.clf.fit(train_matrix,output_matrix.ravel())
 
         # Dumping extracted data
-        clf_file=os.path.join(self.base_path,'clf.p')
+        clf_file = os.path.join(self.base_path,'clf.p')
         pickle.dump(self.clf,open(clf_file,'wb'))
+
+    def load_data(self):
+        # Load dump data
+        data_file = os.path.join(self.base_path, 'data.p')
+        data = pickle.load(open(data_file, 'rb'))
+        
+        self.categories = data['categories']
+        self.stems = data['stems']
+        self.idf_vector = data['idf_vector']
+
+    def load_clf(self):
+        clf_file = os.path.join(self.base_path, 'clf.p')
+        self.clf = pickle.load(open(clf_file, 'rb'))
     
     # Compute tf-idf for a text
-    def tf_idf_vector(self,text):
-        # Load stems list
-        stems_file = os.path.join(self.base_path, 'stems.p')
-        self.stems = pickle.load(open(stems_file, 'rb'))
-        
-        # Load idf of stems
-        idf_file = os.path.join(self.base_path, 'idf.p')
-        self.idf_vector = pickle.load(open(idf_file, 'rb'))
+    def tf_idf_vector(self, text):
+        if (not(self.stems)):
+            self.load_data()
 
         # Find stems in document
-        doc_stems=stemmer.get_known_stems(text)
+        doc_stems = stemmer.get_known_stems(text)
 
         # Obtain known stems set
-        doc_stems_set=set(doc_stems)
+        doc_stems_set = set(doc_stems)
 
-        doc_vector={}
+        # Document vector
+        doc_vector = {stem:doc_stems.count(stem) for stem in doc_stems_set} 
 
-        for stem in doc_stems_set:
-            doc_vector[stem]=doc_stems.count(stem)
+        doc_vector_list = [doc_vector.get(stem,0) for stem in self.stems]
 
-        doc_vector_list=[doc_vector.get(stem,0) for stem in self.stems]
+        max_count = max(doc_vector_list)
 
-        max_count=max(doc_vector_list)
+        tf_vector = [0.5+0.5/max_count*x for x in doc_vector_list]
 
-        tf_vector=[0.5+0.5/max_count*x for x in doc_vector_list]
-
-        tf_idf_vector=[]
+        tf_idf_vector = []
         for i,stem in enumerate(self.stems):
             tf_idf_vector.append(tf_vector[i]*self.idf_vector[stem])
 
@@ -192,16 +206,16 @@ class NepClassifier():
 
     # Predict the class
     def predict(self,text):
-        tf_idf_vector=self.tf_idf_vector(text)
+        tf_idf_vector = self.tf_idf_vector(text)
+
+        if(not(self.clf)):
+            self.load_clf()
         
-        clf_file = os.path.join(self.base_path, 'clf.p')
-        self.clf = pickle.load(open(clf_file, 'rb'))
-        
-        class_id=int(round(self.clf.predict(tf_idf_vector)[0]))
-        return (categories[class_id])
+        class_id = int(round(self.clf.predict(tf_idf_vector)[0]))
+        return (self.categories[class_id])
 
 if __name__ == '__main__':
-    var1=NepClassifier()
+    var1 = NepClassifier()
     print('Obtaining documents list')
     var1.load_documents()
 
