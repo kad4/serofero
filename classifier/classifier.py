@@ -31,11 +31,16 @@ class NepClassifier():
         # Stems to use as feature
         self.stems = None
 
+        # Vector to hold the IDF of stems
         self.idf_vector = None
 
-        # Classifier
+        # Training Documents
         self.documents = []
+
+        # Document categories
         self.categories = []
+
+        # Classifier
         self.clf = None
 
     def process_corpus(self):
@@ -44,11 +49,10 @@ class NepClassifier():
         idf_vector = {}        
 
         for root,dirs,files in os.walk(self.data_path):
-            for file_pth in files:
-                file_path = os.path.join(root, file_pth)
-                abs_file_path = os.path.join(self.base_path, file_path)
+            for file_path in files:
+                abs_path = os.path.join(self.base_path, root, file_path)
 
-                file = open(abs_file_path, 'r')
+                file = open(abs_path, 'r')
                 content = file.read()
                 file.close()
 
@@ -237,7 +241,8 @@ class NepClassifier():
         class_id = int(round(self.clf.predict(tf_idf_vector)[0]))
         return (self.categories[class_id])
 
-if __name__ == '__main__':
+
+def main():
     var1 = NepClassifier()
 
     print('Processing Corpus')
@@ -260,3 +265,6 @@ if __name__ == '__main__':
                             उनले सिन्धुपाल्चोकको विभिन्न गाविसमा सोलार बत्ति, घर बनाउने जस्तापाता, त्रिपाललगायतका सामग्री वितरण गरेका हुन । लामाले अमेरिकन सोलर बत्ति भूकम्प अति प्रभावित जिल्लामा वितरण गर्दै आएका छन् । अहिलेसम्म उनले ७० थान सोलार, ८५ बन्डल जस्तापाता र ३० बन्डल त्रिपाल वितरण गरिसकेका हुन । उनले पहिलो चरणमा राहत स्वरुप त्रिपाल वितरण गरे । त्यसपछि बस्ने बास बनाउनका लागि जस्तापाता र अहिले विजुली बाल्नका लागि सोलार बाडेका हुन ।
                         जलबायु परिवर्तन सम्वन्धी काम गर्दै आएका लामाले गत बैशाख १२ पछिदेखि हालसम्म राहतका सामग्री निरन्तर बाड्दै आएका हुन । उनका अनुसार केही दिनमा दोलखा र नुवाकोटका केही विद्यालय तथा सार्वजनिक स्थलमा पनि सोलार राखिदिने छ । उक्त सोलार अमेरिकी एक संस्थासँग अर्डर गरिसकेको बताए । उक्त सोलारको प्रतिथान मूल्य ५० हजारदेखि ७० हजारसम्म पर्ने बताए । त्यसबाट १ सय ५० वाट विजुली निकाल्न सकिने क्षमताको छ । उनले हालसम्म रामेछाप, सिन्धुपाल्चोक, दोलखा, नुवाकोटलगायतका जिल्लामा विभिन्न सामग्री वितरण गरिसकेका छन् । यसैगरी भूकम्पबाट प्रभावित जिल्लामा मानिसलाई राहत स्वरुप रकम समेत उपलब्ध गराइसकेको छ । """)    
     print(cls)
+
+if __name__ == '__main__':
+    main()

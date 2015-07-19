@@ -14,7 +14,6 @@ def obtain_articles():
     articles = parser.get_articles()
 
     clf = NepClassifier()
-    clf.load_data()
     clf.load_clf()
 
     for article in articles:
