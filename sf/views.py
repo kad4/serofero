@@ -13,11 +13,29 @@ def index(request):
 	politics = politics[1:6]
 
 	content_dict = {
-		'news_first' : news_first,
 		'news' : news,
+		'news_first' : news_first,
 
 		'politics' : politics,
 		'politics_first' : politics_first,
+
+		'business' : politics,
+		'business_first' : politics_first,
+
+		'sports' : politics,
+		'sports_first' : politics_first,
+
+		'entertain' : politics,
+		'entertain_first' : politics_first
 	}
 
 	return render(request, 'sf/index.html', content_dict)
+
+def category(request, category = 'news'):
+	articles = Article.objects.filter(category = category)
+
+	content_dict = {
+		'category_name' : category,
+		'articles' : articles,
+	}
+	return render(request, 'sf/category.html', content_dict)

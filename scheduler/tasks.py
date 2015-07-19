@@ -21,11 +21,11 @@ def obtain_articles():
         category = clf.predict(article['content'])
 
         obj = Article.objects.create(
-                title = article['title'],
-                url = article['link'],
-                content = article['content'][:300],
-                img_url = article['img_url'],
-                category = category
+            url = article['link'],
+            title = article['title'],
+            content = article['content'][:300],
+            img_url = article['img_url'],
+            category = category
         )
 
         # Download and save image
