@@ -19,6 +19,7 @@ def obtain_articles():
 
     for article in articles:
         category = clf.predict(article['content'])
+        print(article['link'],' ',category)
 
         obj = Article.objects.create(
             url = article['link'],

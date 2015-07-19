@@ -4,7 +4,7 @@ from django.shortcuts import render,get_object_or_404
 from .models import Article
 
 def index(request):
-	news = Article.objects.filter(category = 'news')[:6]
+	news = Article.objects.filter(category = 'news').order_by('-pub_date')[:6]
 	news_first = news[0]
 	news = news[1:6]
 
@@ -26,13 +26,15 @@ def index(request):
 		'sports_first' : politics_first,
 
 		'entertain' : politics,
-		'entertain_first' : politics_first
+		'entertain_first' : politics_first,
+
+		'popular' : news,
 	}
 
 	return render(request, 'sf/index.html', content_dict)
 
 def category(request, category = 'news'):
-	articles = Article.objects.filter(category = category)
+	articles = Article.objects.filter(category = category).order_by('-pub_date')
 
 	content_dict = {
 		'category_name' : category,
