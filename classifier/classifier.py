@@ -22,8 +22,11 @@ class NepClassifier():
         # Folder containg data
         self.data_path = os.path.join(self.base_path, 'data')
 
-        # Number of documents for each class
-        self.doc_num = 1000
+        # Training data for each class
+        self.doc_num = 1200
+        
+        # Total testing data
+        self.test_num = 1000
 
         # Maximum stems to use
         self.max_stems = 2000
@@ -34,8 +37,9 @@ class NepClassifier():
         # Vector to hold the IDF of stems
         self.idf_vector = None
 
-        # Training Documents
-        self.documents = []
+        # Training data to use
+        self.train_data = []
+        self.test_data = []
 
         # Document categories
         self.categories = []
@@ -45,8 +49,10 @@ class NepClassifier():
 
     def process_corpus(self):
         # Vectors for stems
-        stems_dict = {}
-        idf_vector = {}        
+        count_vector = {}
+        idf_vector_total = {}
+
+        total_docs = 0
 
         for root,dirs,files in os.walk(self.data_path):
             for file_path in files:
@@ -62,21 +68,25 @@ class NepClassifier():
 
                 # Add the count of stems
                 for stem in doc_stems:
-                    stems_dict[stem] = stems_dict.get(stem,0)+1
+                    count_vector[stem] = count_vector.get(stem,0) + 1
 
                 for stem in doc_stems_set:
-                    idf_vector[stem] = idf_vector.get(stem, 0)+1
+                    idf_vector_total[stem] = idf_vector_total.get(stem, 0) + 1
+
+                total_docs += 1
 
         # Obtain frequently occuring stems
         stem_tuple=sorted(
-            stems_dict.items(),
+            count_vector.items(),
             key = itemgetter(1),
             reverse = True
         )[10 : self.max_stems+10]
     
         # Construct a ordered list of frequent stems
         stems = [item[0] for item in stem_tuple]
-        idf_vector = {k:v for k,v in idf_vector.items() if k in stems}
+
+        # IDF vector for the stems
+        idf_vector = [log(total_docs / (1 + idf_vector_total[k]) for k in stems)]
         
         # Dump the data obtained
         data = {
@@ -111,37 +121,47 @@ class NepClassifier():
                         'category_id' : category_id
                     })
 
-            self.documents.extend(random.sample(files, self.doc_num))
+            self.train_data.extend(random.sample(files, self.doc_num))
 
             category_id += 1
-   
+
+    def train_test_split(self):
+        # Shuffle the training data
+        random.shuffle(self.train_data)
+
+        # Seperate train and test data
+        # self.test_data = self.train_data[-1000:]
+        # self.train_data = self.train_data[:-1000]
+    
     # Compute tf-idf and train classifier
     def train(self):
-        if(not(self.stems)):
+        if (not(self.stems)):
             raise Exception('Corpus info not available.')
 
-        if(not(self.documents)):
+        if (not(self.train_data)):
             raise Exception('Training data not selected')
 
         stems_size = len(self.stems)
-        docs_size = len(self.documents)
+        docs_size = len(self.train_data)
 
-         # tf matrix
+        # Tf matrix
         tf_matrix = np.ndarray(
             (docs_size, stems_size),
             dtype = 'float16'
         )
 
+        idf_matrix = np.array(self.idf_vector)
+
         # Training matrix
-        train_matrix = np.ndarray(
+        input_matrix = np.ndarray(
             (docs_size, stems_size),
             dtype='float16'
         )
 
-        output_matrix = np.ndarray((docs_size,1), dtype = 'float16')
+        output_matrix = np.ndarray((docs_size, 1), dtype = 'float16')
 
         # Use a sample of documents
-        for i,doc in enumerate(self.documents):
+        for i,doc in enumerate(self.train_data):
 
             file = open(doc['path'], 'r')
             content = file.read()
@@ -150,39 +170,32 @@ class NepClassifier():
             # Find stems in document
             doc_stems = stemmer.get_known_stems(content)
 
-            # Obtain known stems set
-            doc_stems_set = set(doc_stems)
-
             doc_vector = {}
+            for stem in doc_stems:
+                doc_vector[stem] = doc_vector.get(stem, 0) + 1
 
-            # Add their occurances
-            max_count = 1
-            for stem in doc_stems_set:
-                count = doc_stems.count(stem)            
-                doc_vector[stem] = count
-                if(count > max_count):
-                    max_count = count 
+            doc_vector_list = doc_vector.values()
+            if(not(doc_vector_list)):
+                max_count = 1
+            else:
+                max_count = max(doc_vector_list)
+                if (max_count == 0):
+                    max_count = 1
 
             # Compute the tf and append it
-            tf_matrix[i, :] = 0.5+0.5/max_count*np.array(
-                [doc_vector.get(stem,0) for stem in self.stems]
+            tf_matrix[i, :] = 0.5 + (0.5 / max_count) * np.array(
+                [doc_vector.get(stem, 0) for stem in self.stems]
             )
 
-            output_matrix[i,0] = doc['category_id']
-
-        idf_matrix = np.array([
-            log(docs_size/(1+x)) 
-            for x
-            in [self.idf_vector[stem] for stem in self.stems]
-        ])
+            output_matrix[i, 0] = doc['category_id']
 
         # Element wise multiplication
         for i in range(docs_size):
-            train_matrix[i,:] = tf_matrix[i,:] * idf_matrix
+            input_matrix[i, :] = tf_matrix[i, :] * idf_matrix
 
         # Assign and train a SVM
         clf = svm.SVC()
-        clf.fit(train_matrix,output_matrix.ravel())
+        clf.fit(input_matrix,output_matrix.ravel())
 
         data = {
             'categories' : self.categories,
@@ -194,7 +207,7 @@ class NepClassifier():
         pickle.dump(data,open(clf_file,'wb'))
 
     def load_clf(self):
-        if(not(self.stems)):
+        if (not(self.stems)):
             self.load_data()
 
         clf_file = os.path.join(self.base_path, 'clf.p')
@@ -211,59 +224,64 @@ class NepClassifier():
         # Find stems in document
         doc_stems = stemmer.get_known_stems(text)
 
-        # Obtain known stems set
-        doc_stems_set = set(doc_stems)
+        doc_vector = {}
+        for stem in doc_stems:
+            doc_vector[stem] = doc_vector.get(stem, 0) + 1
 
-        # Document vector
-        doc_vector = {stem:doc_stems.count(stem) for stem in doc_stems_set} 
-
-        doc_vector_list = [doc_vector.get(stem,0) for stem in self.stems]
+        doc_vector_list = [doc_vector.get(stem, 0) for stem in self.stems]
 
         max_count = max(doc_vector_list)
-        if(max_count == 0):
+        if (max_count == 0):
             max_count = 1
 
-        tf_vector = [0.5+0.5/max_count*x for x in doc_vector_list]
+        tf_vector = [0.5 + (0.5 / max_count) * x for x in doc_vector_list]
 
         tf_idf_vector = []
         for i,stem in enumerate(self.stems):
-            tf_idf_vector.append(tf_vector[i]*self.idf_vector[stem])
+            tf_idf_vector.append(tf_vector[i] * self.idf_vector[stem])
 
         return(tf_idf_vector)
 
     # Predict the class
     def predict(self,text):
-        if(not(self.clf)):
+        if (not(self.clf)):
             raise Exception('Classifier not loaded')
-
-        tf_idf_vector = self.tf_idf_vector(text)
         
-        class_id = int(round(self.clf.predict(tf_idf_vector)[0]))
+        if (text == ''):
+            raise Exception('Empty text provided')
+        
+        tf_idf_vector = self.tf_idf_vector(text)
+        output_val = self.clf.predict(tf_idf_vector)[0]
+        
+        class_id = int(output_val)
         return (self.categories[class_id])
-
 
 def main():
     var1 = NepClassifier()
 
-    print('Processing Corpus')
+    # print('Processing Corpus')
     # var1.process_corpus()
     
-    print('Loading Corpus Info')
+    # print('Loading Corpus Info')
     # var1.load_data()
 
-    print('Loading Training Data')
+    # print('Loading Training Data')
     # var1.load_training_data()
 
-    print('Training SVM')
+    # print('Splitting data in train and test')
+    # var1.train_test_split()
+
+    # print('Training SVM')
     # var1.train()
 
     print('Loading Classifier')
     var1.load_clf()
+    
+    test_file = open('test_ent.txt', 'r')
+    content = test_file.read()
 
     print('Predicting class')
-    cls = var1.predict(""" ३ साउन, कठमाडौं । समाजसेवी फुर्पा लामाले भूकम्प अतिप्रभावित जिल्लामा १५ लाख रुपैयाँ बराबरको सोलार बत्ति तथा अन्य राहत सामग्री वितरण गरेका छन् । लामाको व्यत्तिगत पहलमा विदेशमा रहेका साथी तथा संघसंस्थामार्फ उपलब्ध भएका विभिन्न राहत सामग्री वितरण गरेका हुन ।
-                            उनले सिन्धुपाल्चोकको विभिन्न गाविसमा सोलार बत्ति, घर बनाउने जस्तापाता, त्रिपाललगायतका सामग्री वितरण गरेका हुन । लामाले अमेरिकन सोलर बत्ति भूकम्प अति प्रभावित जिल्लामा वितरण गर्दै आएका छन् । अहिलेसम्म उनले ७० थान सोलार, ८५ बन्डल जस्तापाता र ३० बन्डल त्रिपाल वितरण गरिसकेका हुन । उनले पहिलो चरणमा राहत स्वरुप त्रिपाल वितरण गरे । त्यसपछि बस्ने बास बनाउनका लागि जस्तापाता र अहिले विजुली बाल्नका लागि सोलार बाडेका हुन ।
-                        जलबायु परिवर्तन सम्वन्धी काम गर्दै आएका लामाले गत बैशाख १२ पछिदेखि हालसम्म राहतका सामग्री निरन्तर बाड्दै आएका हुन । उनका अनुसार केही दिनमा दोलखा र नुवाकोटका केही विद्यालय तथा सार्वजनिक स्थलमा पनि सोलार राखिदिने छ । उक्त सोलार अमेरिकी एक संस्थासँग अर्डर गरिसकेको बताए । उक्त सोलारको प्रतिथान मूल्य ५० हजारदेखि ७० हजारसम्म पर्ने बताए । त्यसबाट १ सय ५० वाट विजुली निकाल्न सकिने क्षमताको छ । उनले हालसम्म रामेछाप, सिन्धुपाल्चोक, दोलखा, नुवाकोटलगायतका जिल्लामा विभिन्न सामग्री वितरण गरिसकेका छन् । यसैगरी भूकम्पबाट प्रभावित जिल्लामा मानिसलाई राहत स्वरुप रकम समेत उपलब्ध गराइसकेको छ । """)    
+    cls = var1.predict(content)    
     print(cls)
 
 if __name__ == '__main__':
