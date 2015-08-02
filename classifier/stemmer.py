@@ -4,6 +4,7 @@ import os
 class NepStemmer():
     def __init__(self):
         self.stems_set = set()
+        self.filter_set = set()
         
         self.suffixes = {
             1 : [
@@ -44,17 +45,25 @@ class NepStemmer():
     def read_stems(self):
         # Reads the word stems
         base_path = os.path.dirname(__file__)
-        file_path = os.path.join(base_path,'word_stem.txt')
+        stems_path = os.path.join(base_path, 'word_stem.txt')
 
-        file = open(file_path)
+        file = open(stems_path)
         lines = file.readlines()
         file.close()
 
         # Constructing stems set
         for line in lines:
-            new_line = line.replace('\n','')
+            new_line = line.replace('\n', '')
             stem = new_line.split('|')[0]
             self.stems_set.add(stem)
+
+        # Reads filter words
+        filter_path = os.path.join(base_path, 'stop_words.txt')
+        file = open(filter_path)
+        filter_words = file.read().split('\n')
+        file.close()
+
+        self.filter_set = set(filter_words)
 
     # Removes suffix
     def remove_suffix(self, word):
@@ -104,5 +113,14 @@ class NepStemmer():
         # Obtain the stem list
         stems_list = [self.stem(token) for token in tokens]
 
-        # Returns known stem list
-        return([stem for stem in stems_list if stem in self.stems_set])
+        known_stem = [
+            stem 
+            for stem in stems_list 
+            if stem in self.stems_set
+            and stem not in self.filter_set
+        ]
+
+        return(known_stem)
+
+
+        

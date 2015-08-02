@@ -1,6 +1,7 @@
 import os
 import random
 import pickle
+import logging
 from math import log
 from pathlib import Path
 from operator import itemgetter
@@ -13,6 +14,23 @@ from stemmer import NepStemmer
 stemmer = NepStemmer()
 stemmer.read_stems()
 
+# Creating a logger
+logger = logging.getLogger('Classifier')
+logger.setLevel(logging.DEBUG)
+
+# create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+# add formatter to ch
+ch.setFormatter(formatter)
+
+# add ch to logger
+logger.addHandler(ch)
+
 class NepClassifier():
     """ Class to perform the classification of nepali news """
     def __init__(self):
@@ -22,14 +40,14 @@ class NepClassifier():
         # Folder containg data
         self.data_path = os.path.join(self.base_path, 'data')
 
-        # Training data for each class
-        self.doc_num = 1200
+        # Training data size
+        self.train_num = 10000
         
-        # Total testing data
+        # Test data size
         self.test_num = 1000
 
         # Maximum stems to use
-        self.max_stems = 2000
+        self.max_stems = 1000
 
         # Stems to use as feature
         self.stems = None
@@ -48,6 +66,25 @@ class NepClassifier():
         self.clf = None
 
     def process_corpus(self):
+        ''' 
+            Class method to process corpus located at path provided 
+            at self.data_path
+
+            The data must be organized as utf-8 encoded raw text file
+            having following structure
+
+            root/
+                class1/
+                    text11.txt
+                    text12.txt
+                class2/
+                    text21.txt
+                    text22.txt
+                ...
+        '''
+
+        logger.info('Processing corpus at : ' + self.data_path)
+
         # Vectors for stems
         count_vector = {}
         idf_vector_total = {}
@@ -80,13 +117,18 @@ class NepClassifier():
             count_vector.items(),
             key = itemgetter(1),
             reverse = True
-        )[10 : self.max_stems+10]
+        )[:self.max_stems]
+
+        print(stem_tuple[-10:])
     
         # Construct a ordered list of frequent stems
         stems = [item[0] for item in stem_tuple]
 
         # IDF vector for the stems
-        idf_vector = [log(total_docs / (1 + idf_vector_total[k]) for k in stems)]
+        idf_vector = [
+            log(total_docs / (1 + idf_vector_total[k])) 
+            for k in stems
+        ]
         
         # Dump the data obtained
         data = {
@@ -96,7 +138,12 @@ class NepClassifier():
         data_file = os.path.join(self.base_path, 'data.p')
         pickle.dump(data, open(data_file, 'wb'))
 
-    def load_data(self):
+    def load_corpus_info(self):
+        '''
+            Load the corpus information from the file
+            data.p located along with this script 
+        '''
+
         # Load dump data
         data_file = os.path.join(self.base_path, 'data.p')
         data = pickle.load(open(data_file, 'rb'))
@@ -104,45 +151,59 @@ class NepClassifier():
         self.stems = data['stems']
         self.idf_vector = data['idf_vector']
 
+        logger.info('Corpus info loaded')
+
     def load_training_data(self):
+        '''
+            Load training data from the path specified by
+            self.data_path
+
+            The files are loaded as a dictionary similar to one
+            given below
+            doc = {
+                'path' : '../data/text1.txt',
+                'category_id' : 1
+            }
+        '''
+
         data_path = os.path.join(self.base_path, 'data')
         category_id = 0
+
+        docs = []
+
+        categories = ['economy', 'entertainment', 'politics', 'sports', 'world']
+
         for category in Path(data_path).iterdir():
 
             # Convert path to posix notation
             category_name = category.as_posix().split('/')[-1]
+
+            if (not(category in categories)):
+            	continue
+
             self.categories.append(category_name)
 
-            files = []
-
             for filepath in category.iterdir():
-                files.append({
+                docs.append({
                         'path' : filepath.as_posix(),
                         'category_id' : category_id
                     })
 
-            self.train_data.extend(random.sample(files, self.doc_num))
-
             category_id += 1
 
-    def train_test_split(self):
-        # Shuffle the training data
-        random.shuffle(self.train_data)
+        sample_docs = random.sample(
+            docs,
+            self.train_num + self.test_num
+        )
+        
+        self.test_data = sample_docs[-1000:]
+        self.train_data = sample_docs[:-1000]
+            
+        logger.info('Train and test data loaded')
 
-        # Seperate train and test data
-        # self.test_data = self.train_data[-1000:]
-        # self.train_data = self.train_data[:-1000]
-    
-    # Compute tf-idf and train classifier
-    def train(self):
-        if (not(self.stems)):
-            raise Exception('Corpus info not available.')
-
-        if (not(self.train_data)):
-            raise Exception('Training data not selected')
-
+    def compute_matrix(self, data):
         stems_size = len(self.stems)
-        docs_size = len(self.train_data)
+        docs_size = len(data)
 
         # Tf matrix
         tf_matrix = np.ndarray(
@@ -161,7 +222,7 @@ class NepClassifier():
         output_matrix = np.ndarray((docs_size, 1), dtype = 'float16')
 
         # Use a sample of documents
-        for i,doc in enumerate(self.train_data):
+        for i,doc in enumerate(data):
 
             file = open(doc['path'], 'r')
             content = file.read()
@@ -193,9 +254,27 @@ class NepClassifier():
         for i in range(docs_size):
             input_matrix[i, :] = tf_matrix[i, :] * idf_matrix
 
+        output_matrix = output_matrix.ravel()
+
+        return (input_matrix, output_matrix)
+    
+    # Compute tf-idf and train classifier
+    def train(self):
+        if (not(self.stems)):
+            raise Exception('Corpus info not available.')
+
+        if (not(self.train_data)):
+            raise Exception('Training data not selected')
+
+        logger.info('Computing feature matrix')
+
+        input_matrix, output_matrix = self.compute_matrix(self.train_data)
+
+        logger.info('Training classifier')
+
         # Assign and train a SVM
         clf = svm.SVC()
-        clf.fit(input_matrix,output_matrix.ravel())
+        clf.fit(input_matrix,output_matrix)
 
         data = {
             'categories' : self.categories,
@@ -205,7 +284,7 @@ class NepClassifier():
         # Dumping extracted data
         clf_file = os.path.join(self.base_path,'clf.p')
         pickle.dump(data,open(clf_file,'wb'))
-
+    
     def load_clf(self):
         if (not(self.stems)):
             self.load_data()
@@ -215,7 +294,9 @@ class NepClassifier():
 
         self.categories = data['categories']
         self.clf = data['clf']
-    
+
+        logger.info('Classifier loaded')
+
     # Compute tf-idf for a text
     def tf_idf_vector(self, text):
         if (not(self.stems)):
@@ -237,8 +318,8 @@ class NepClassifier():
         tf_vector = [0.5 + (0.5 / max_count) * x for x in doc_vector_list]
 
         tf_idf_vector = []
-        for i,stem in enumerate(self.stems):
-            tf_idf_vector.append(tf_vector[i] * self.idf_vector[stem])
+        for i in range(len(self.stems)):
+            tf_idf_vector.append(tf_vector[i] * self.idf_vector[i])
 
         return(tf_idf_vector)
 
@@ -256,33 +337,25 @@ class NepClassifier():
         class_id = int(output_val)
         return (self.categories[class_id])
 
+    def validate_model(self):
+        if (not(self.clf)):
+            raise Exception('Classifier not loaded')
+
+        input_matrix, output_matrix = self.compute_matrix(self.train_data)
+
+        return(self.clf.score(input_matrix, output_matrix))
+
 def main():
     var1 = NepClassifier()
-
-    # print('Processing Corpus')
     # var1.process_corpus()
+
+    var1.load_corpus_info()
+    var1.load_training_data()
     
-    # print('Loading Corpus Info')
-    # var1.load_data()
-
-    # print('Loading Training Data')
-    # var1.load_training_data()
-
-    # print('Splitting data in train and test')
-    # var1.train_test_split()
-
-    # print('Training SVM')
-    # var1.train()
-
-    print('Loading Classifier')
+    var1.train()
     var1.load_clf()
-    
-    test_file = open('test_ent.txt', 'r')
-    content = test_file.read()
-
-    print('Predicting class')
-    cls = var1.predict(content)    
-    print(cls)
+    score = var1.validate_model()
+    print('Accuracy : ', score*100, '%')
 
 if __name__ == '__main__':
     main()
