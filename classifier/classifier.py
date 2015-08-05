@@ -8,11 +8,11 @@ from operator import itemgetter
 
 import numpy as np
 from sklearn import svm
+from sklearn.externals import joblib
 
 from stemmer import NepStemmer
 
 stemmer = NepStemmer()
-stemmer.read_stems()
 
 # Creating a logger
 logger = logging.getLogger('Classifier')
@@ -60,7 +60,14 @@ class NepClassifier():
         self.test_data = []
 
         # Document categories
-        self.categories = []
+        self.categories = [
+            'economy', 
+            'entertainment',
+            'news',
+            'politics', 
+            'sports', 
+            'world'
+        ]
 
         # Classifier
         self.clf = None
@@ -118,8 +125,6 @@ class NepClassifier():
             key = itemgetter(1),
             reverse = True
         )[:self.max_stems]
-
-        print(stem_tuple[-10:])
     
         # Construct a ordered list of frequent stems
         stems = [item[0] for item in stem_tuple]
@@ -135,6 +140,7 @@ class NepClassifier():
             'stems' : stems,
             'idf_vector' : idf_vector
         }
+
         data_file = os.path.join(self.base_path, 'data.p')
         pickle.dump(data, open(data_file, 'wb'))
 
@@ -144,6 +150,8 @@ class NepClassifier():
             data.p located along with this script 
         '''
 
+        logger.info('Loading corpus info')
+
         # Load dump data
         data_file = os.path.join(self.base_path, 'data.p')
         data = pickle.load(open(data_file, 'rb'))
@@ -151,9 +159,7 @@ class NepClassifier():
         self.stems = data['stems']
         self.idf_vector = data['idf_vector']
 
-        logger.info('Corpus info loaded')
-
-    def load_training_data(self):
+    def load_dataset(self):
         '''
             Load training data from the path specified by
             self.data_path
@@ -162,44 +168,58 @@ class NepClassifier():
             given below
             doc = {
                 'path' : '../data/text1.txt',
-                'category_id' : 1
+                'category' : 'news'
             }
         '''
 
-        data_path = os.path.join(self.base_path, 'data')
-        category_id = 0
+        logger.info('Loading dataset')
 
-        docs = []
-
-        categories = ['economy', 'entertainment', 'politics', 'sports', 'world']
-
-        for category in Path(data_path).iterdir():
+        documents = []
+        for category in Path(self.data_path).iterdir():
 
             # Convert path to posix notation
             category_name = category.as_posix().split('/')[-1]
-
-            if (not(category in categories)):
+            
+            if (not(category_name in self.categories)):
             	continue
 
-            self.categories.append(category_name)
-
             for filepath in category.iterdir():
-                docs.append({
-                        'path' : filepath.as_posix(),
-                        'category_id' : category_id
-                    })
-
-            category_id += 1
+                documents.append({
+                    'path' : filepath.as_posix(),
+                    'category' : category_name
+                })
 
         sample_docs = random.sample(
-            docs,
+            documents,
             self.train_num + self.test_num
         )
         
         self.test_data = sample_docs[-1000:]
         self.train_data = sample_docs[:-1000]
-            
-        logger.info('Train and test data loaded')
+
+    # Compute tf for a text
+    def tf_vector(self, text):
+        # Find stems in document
+        doc_stems = stemmer.get_known_stems(text)
+
+        # Contruct dictionary of stems
+        doc_vector = {}
+        for stem in doc_stems:
+            doc_vector[stem] = doc_vector.get(stem, 0) + 1
+
+        # Convert dictionary into list
+        doc_vector_list = [doc_vector.get(stem, 0) for stem in self.stems]
+
+        max_count = max(doc_vector_list)
+        if(max_count == 0):
+            max_count = 1
+
+        # Calculate the tf of text
+        tf_vector = 0.5 + (0.5 / max_count) * np.array(
+            [doc_vector.get(stem, 0) for stem in self.stems]
+        )
+
+        return(tf_vector)
 
     def compute_matrix(self, data):
         stems_size = len(self.stems)
@@ -221,34 +241,17 @@ class NepClassifier():
 
         output_matrix = np.ndarray((docs_size, 1), dtype = 'float16')
 
-        # Use a sample of documents
-        for i,doc in enumerate(data):
+        # Loop to construct the training matrix
+        for i, doc in enumerate(data):
 
-            file = open(doc['path'], 'r')
-            content = file.read()
-            file.close()
-
-            # Find stems in document
-            doc_stems = stemmer.get_known_stems(content)
-
-            doc_vector = {}
-            for stem in doc_stems:
-                doc_vector[stem] = doc_vector.get(stem, 0) + 1
-
-            doc_vector_list = doc_vector.values()
-            if(not(doc_vector_list)):
-                max_count = 1
-            else:
-                max_count = max(doc_vector_list)
-                if (max_count == 0):
-                    max_count = 1
-
+            with open(doc['path'], 'r') as file: 
+                content = file.read()
+            
             # Compute the tf and append it
-            tf_matrix[i, :] = 0.5 + (0.5 / max_count) * np.array(
-                [doc_vector.get(stem, 0) for stem in self.stems]
-            )
+            tf_vector = self.tf_vector(content)
+            tf_matrix[i, :] = tf_vector 
 
-            output_matrix[i, 0] = doc['category_id']
+            output_matrix[i, 0] = self.categories.index(doc['category'])
 
         # Element wise multiplication
         for i in range(docs_size):
@@ -260,6 +263,11 @@ class NepClassifier():
     
     # Compute tf-idf and train classifier
     def train(self):
+        '''
+            This method obtains the tf-idf matrix of the training
+            data and then trains the SVM 
+        '''
+
         if (not(self.stems)):
             raise Exception('Corpus info not available.')
 
@@ -273,58 +281,48 @@ class NepClassifier():
         logger.info('Training classifier')
 
         # Assign and train a SVM
-        clf = svm.SVC()
-        clf.fit(input_matrix,output_matrix)
-
-        data = {
-            'categories' : self.categories,
-            'clf' : clf,
-        }
+        clf = svm.SVC(C = 50.0)
+        clf.fit(input_matrix, output_matrix)
 
         # Dumping extracted data
-        clf_file = os.path.join(self.base_path,'clf.p')
-        pickle.dump(data,open(clf_file,'wb'))
+        clf_file = os.path.join(self.base_path, 'clf.p')
+        joblib.dump(clf, clf_file)
     
     def load_clf(self):
+        '''
+            Loads the trained classifier from file
+        '''
+        logger.info('Loading classifier')
+
         if (not(self.stems)):
             self.load_data()
 
         clf_file = os.path.join(self.base_path, 'clf.p')
-        data = pickle.load(open(clf_file, 'rb'))
+        self.clf = joblib.load(clf_file)
 
-        self.categories = data['categories']
-        self.clf = data['clf']
-
-        logger.info('Classifier loaded')
-
-    # Compute tf-idf for a text
     def tf_idf_vector(self, text):
+        '''
+            Calculates the tf-idf for a given text
+        '''
         if (not(self.stems)):
-            raise Exception('Corpus info not available')
+            raise Exception('Corpus info not available')       
 
-        # Find stems in document
-        doc_stems = stemmer.get_known_stems(text)
-
-        doc_vector = {}
-        for stem in doc_stems:
-            doc_vector[stem] = doc_vector.get(stem, 0) + 1
-
-        doc_vector_list = [doc_vector.get(stem, 0) for stem in self.stems]
-
-        max_count = max(doc_vector_list)
-        if (max_count == 0):
-            max_count = 1
-
-        tf_vector = [0.5 + (0.5 / max_count) * x for x in doc_vector_list]
+        tf_vector = self.tr_vector(text)
 
         tf_idf_vector = []
         for i in range(len(self.stems)):
             tf_idf_vector.append(tf_vector[i] * self.idf_vector[i])
 
+        tf_idf_vector = tf_vector * np.array(self.idf_vector)
+
         return(tf_idf_vector)
 
     # Predict the class
-    def predict(self,text):
+    def predict(self, text):
+        '''
+            Function to predict the class of given text
+        '''
+
         if (not(self.clf)):
             raise Exception('Classifier not loaded')
         
@@ -338,6 +336,12 @@ class NepClassifier():
         return (self.categories[class_id])
 
     def validate_model(self):
+        '''
+            Performs the model validation
+        '''
+
+        logger.info('Validating model')
+
         if (not(self.clf)):
             raise Exception('Classifier not loaded')
 
@@ -350,12 +354,12 @@ def main():
     # var1.process_corpus()
 
     var1.load_corpus_info()
-    var1.load_training_data()
+    var1.load_dataset()
     
     var1.train()
     var1.load_clf()
     score = var1.validate_model()
-    print('Accuracy : ', score*100, '%')
+    print('Accuracy : ', score * 100, '%')
 
 if __name__ == '__main__':
     main()

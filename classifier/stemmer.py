@@ -41,15 +41,19 @@ class NepStemmer():
             ],
         }
 
+        # Read stems and filter words from files
+        self.read_stems()
+
     # Read stems from file
     def read_stems(self):
         # Reads the word stems
         base_path = os.path.dirname(__file__)
-        stems_path = os.path.join(base_path, 'word_stem.txt')
 
-        file = open(stems_path)
-        lines = file.readlines()
-        file.close()
+        stems_path = os.path.join(base_path, 'stems.txt')
+        filter_path = os.path.join(base_path, 'filter.txt')
+
+        with open(stems_path) as file:
+            lines = file.readlines()
 
         # Constructing stems set
         for line in lines:
@@ -58,12 +62,10 @@ class NepStemmer():
             self.stems_set.add(stem)
 
         # Reads filter words
-        filter_path = os.path.join(base_path, 'stop_words.txt')
-        file = open(filter_path)
-        filter_words = file.read().split('\n')
-        file.close()
+        with open(filter_path) as file:
+            filter_stems = file.read().split('\n')
 
-        self.filter_set = set(filter_words)
+        self.filter_set = set(filter_stems)
 
     # Removes suffix
     def remove_suffix(self, word):

@@ -85,12 +85,25 @@ def get_article(url, img = False):
                 img_tag = soup.find('img')
                 if(img_tag):
                     img_url = img_tag['src']
-          
+
+        elif(parsedURL.netloc ==  'www.ujyaaloonline.com'):
+            soup = soup.find('div', class_ = "detailbox")
+
+            paragraphs = soup.find_all('p')
+
+            content = ''.join([
+                item.string
+                for item in paragraphs
+                if item.string
+            ])
+
+            if(img):
+                pass
         else:
             print('Match for the site not found')
 
         return([content,img_url])
 
 if __name__ == '__main__':
-    print(get_article('http://www.onlinekhabar.com/2015/06/293286/',img=True))
+    print(get_article('http://www.ujyaaloonline.com/news/44540/most-valuable-brand/',img = False))
 
