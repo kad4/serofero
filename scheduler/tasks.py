@@ -7,7 +7,7 @@ from sf.models import Article
 from .parser import RSSParser
 from .extractor import get_article
 
-from classifier.NepClassifier import NepClassifier
+from NepClassifier.NepClassifier import NepClassifier
 
 @shared_task
 def obtain_articles():

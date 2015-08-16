@@ -16,7 +16,9 @@
 	        <ul class="fashion_catgnav">
 	          	<li>
 	                <div class="catgimg2_container">
-	                	<a href="{{ news_first.url }}"><img alt="img" src="{{ news_first.image.url}}"></a>
+	                	{% if news_first.image %}
+                            <a href="{{ news_first.url }}"><img alt="img" src="{{ news_first.image.url}}"></a>
+                        {% endif %}
 	                </div>
 
 	                <h2 class="catg_titile">
@@ -41,7 +43,9 @@
 	        	{% for article in news %}
 	            <li>
 	                <div class="media wow fadeInDown">
-	                    <a class="media-left" href="single.html"><img src="{{ article.image.url }}" alt="img"></a>
+	                    {% if article.image %}
+                            <a class="media-left" href="single.html"><img src="{{ article.image.url }}" alt="img"></a>
+                        {% endif %}
 
 	                    <div class="media-body">
 	                        <h4 class="media-heading"><a href="#">{{ article.title }}</a></h4> 
@@ -70,7 +74,9 @@
 	          	<ul class="fashion_catgnav wow fadeInDown">
 	                <li>
 	                    <div class="catgimg2_container">
-	                    	<a href="{{ politics_first.url }}"><img alt="img" src="{{ politics_first.image.url }}"></a>
+                            {% if politics_first.image %}
+                                <a href="{{ politics_first.url }}"><img alt="img" src="{{ politics_first.image.url }}"></a>
+                            {% endif %}
 	                    </div>
 
 	                    <h2 class="catg_titile"><a href="{{ politics_first.url }}">{{ politics_first.title }}</a></h2>
@@ -78,7 +84,7 @@
 	                    <div class="comments_box">
 	                        <span class="meta_date">14/12/2013</span>
 	                        <span class="meta_comment"><a href="#">No Comments</a></span>
-	                        <span class="meta_more"><a  href="#">Read More...</a></span>
+	                        <span class="meta_more"><a href="#">Read More...</a></span>
 	                    </div>
 	                    <p>{{ politics_first.content }}</p>
 	                </li>
@@ -88,7 +94,9 @@
 	                {% for article in politics %}
 	                <li>
 	                    <div class="media">
-	                        <a class="media-left" href="#"><img src="{{ article.image.url }}" alt="img"></a>
+	                        {% if article.image %}
+                                <a class="media-left" href="#"><img src="{{ article.image.url }}" alt="img"></a>
+                            {% endif %}
 
 	                        <div class="media-body">
 	                            <h4 class="media-heading"><a href="{{ article.url }}">{{ article.title }}</a></h4>
@@ -117,7 +125,9 @@
 	                <ul class="fashion_catgnav wow fadeInDown">
 	                  	<li>
 	                        <div class="catgimg2_container">
-	                        	<a href="{{ business_first.url }}"><img alt="img" src="{{ business_first.image.url }}"></a>
+	                        	{% if business_first.image %}
+                                    <a href="{{ business_first.url }}"><img alt="img" src="{{ business_first.image.url }}"></a>
+                                {% endif %}
 	                        </div>
 
 	                        <h2 class="catg_titile"><a href="{{ business_first.url }}">{{ business_first.title }}</a></h2>
@@ -136,7 +146,9 @@
 	                  	{% for article in business %}
 	                  	<li>
 	                        <div class="media wow fadeInDown">
-	                          	<a class="media-left" href="{{ article.url }}"><img src="{{ article.image.url }}" alt="img"></a>
+	                          	{% if article.image %}
+                                    <a class="media-left" href="{{ article.url }}"><img src="{{ article.image.url }}" alt="img"></a>
+                                {% endif %}
 
 	                          	<div class="media-body">
 	                                <h4 class="media-heading">
@@ -169,7 +181,9 @@
 	            	<li>
 	              		<div class="catgimg2_container">
 	                		<a href="#">
-	                			<img alt="img" src="{{ sports_first.image.url }}">
+	                			{% if sports_first.image %}
+                                    <img alt="img" src="{{ sports_first.image.url }}">
+                                {% endif %}
 	                		</a>
 	              		</div>
 	              		<h2 class="catg_titile">
@@ -191,7 +205,9 @@
 	        		<li>
 	          			<div class="media wow fadeInDown">
 	            			<a class="media-left" href="{{ article.url }}">
-	              				<img src="{{ article.image.url }}" alt="img">
+	              				{% if article.image %}
+                                    <img src="{{ article.image.url }}" alt="img">
+                                {% endif %}
 	            			</a>
 	            			<div class="media-body">
 	                  			<h4 class="media-heading">
@@ -224,7 +240,9 @@
 	                <li>
 	                    <div class="catgimg2_container">
 	                    <a href="{{ entertain_first.url }}">
-	                        <img alt="img" src="{{ entertain_first.image.url }}">
+                            {% if entertain_first.image %}
+	                        	<img alt="img" src="{{ entertain_first.image.url }}">
+                            {% endif %}
 	                    </a>
 	                    </div>
 
@@ -246,7 +264,9 @@
 	                <li>
 	                    <div class="media">
 	                        <a class="media-left" href="#">
-	                            <img src="{{ article.image.url }}" alt="img">
+                                {% if article.image %}
+                                    <img src="{{ article.image.url }}" alt="img">
+                                {% endif %}
 	                        </a>
 	                        <div class="media-body">
 	                            <h4 class="media-heading">
@@ -277,7 +297,9 @@
 	  		{% for article in popular %}
 	    	<li>
 	      		<div class="media wow fadeInDown">
-		        	<a href="{{ article.url }}" class="media-left"><img alt="img" src="{{ article.image.url }}"></a>
+                    {% if article.image %}
+		        	    <a href="{{ article.url }}" class="media-left"><img alt="img" src="{{ article.image.url }}"></a>
+                    {% endif %}
 		        	<div class="media-body">
 		          		<h4 class="media-heading"><a href="{{ article.url }}">{{ article.title }}</a></h4> 
 		          		<p>{{ article.content }}</p>
