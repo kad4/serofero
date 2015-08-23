@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404
 
-from .models import Article
+from sf.models import Article
 
 def get_articles(category):
     articles = Article.objects.filter(category = category).order_by('-pub_date')
