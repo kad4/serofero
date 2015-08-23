@@ -1,7 +1,11 @@
+import json
 import time
 
+import numpy as np
+from numpy.linalg import norm
 import requests
 from celery import shared_task
+from django.utils import timezone
 
 from sf.models import Article
 from .parser import RSSParser
@@ -25,6 +29,9 @@ def obtain_articles():
     clf.load_corpus_info()
     clf.load_clf()
 
+    article_ids = []
+    
+    print("Extracting articles")
     for article in articles:
         title = article['title']
         link = article['link']
@@ -51,3 +58,35 @@ def obtain_articles():
             obj.get_remote_img()
             
             obj.save()
+
+            article_ids.append(obj.id)
+
+    print("Calculating similar articles")
+
+    now = timezone.now()
+    day = now.day
+
+    article_ids = [51, 52, 53, 54, 55, 56, 57, 58, 59]
+
+    articles = Article.objects.filter(pub_date__day = day)
+    for article_id in article_ids:
+        article = Article.objects.get(pk = article_id)
+
+        article_vector = clf.tf_idf_vector(article.content)
+        similar_articles = []
+        
+        for item in articles:
+            if(item.id == article.id):
+                continue
+
+            item_vector = clf.tf_idf_vector(item.content)
+            similarity_cof = np.dot(article_vector, item_vector) / (norm(article_vector) * norm(item_vector))
+
+            print(similarity_cof)
+
+            if(similarity_cof >= 0.9):
+                similar_articles.append(item.id)
+
+        article.similar_articles = json.dumps(similar_articles) 
+        article.save()
+
