@@ -55,7 +55,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'kombu.transport.django.KombuAppConfig',
     'djcelery',
-    'debug_toolbar',
     'sf', 
     'scheduler',
 )
