@@ -12,6 +12,7 @@ from .parser import RSSParser
 from .extractor import get_article
 
 from NepClassifier.NepClassifier import NepClassifier
+from NepClassifier.NepClassifier import TfidfVectorizer
 
 @shared_task
 def obtain_articles():
@@ -26,10 +27,7 @@ def obtain_articles():
     articles = parser.get_articles()
 
     clf = NepClassifier()
-    clf.load_corpus_info()
     clf.load_clf()
-
-    article_ids = []
     
     print("Extracting articles")
     for article in articles:
@@ -59,32 +57,28 @@ def obtain_articles():
             
             obj.save()
 
-            article_ids.append(obj.id)
-
     print("Calculating similar articles")
 
-    now = timezone.now()
-    day = now.day
+    vectorizer = TfidfVectorizer(max_stems = 10000)
+    vectorizer.load_corpus_info()
 
-    article_ids = [51, 52, 53, 54, 55, 56, 57, 58, 59]
+    # Find alternative
+    articles = Article.objects.all()
+    new_articles = Article.objects.filter(similar_articles = '')
 
-    articles = Article.objects.filter(pub_date__day = day)
-    for article_id in article_ids:
-        article = Article.objects.get(pk = article_id)
-
-        article_vector = clf.tf_idf_vector(article.content)
+    for article in new_articles:
+        article_vector = vectorizer.tf_idf_vector(article.content)
         similar_articles = []
         
         for item in articles:
             if(item.id == article.id):
                 continue
 
-            item_vector = clf.tf_idf_vector(item.content)
+            item_vector = vectorizer.tf_idf_vector(item.content)
             similarity_cof = np.dot(article_vector, item_vector) / (norm(article_vector) * norm(item_vector))
 
-            print(similarity_cof)
-
-            if(similarity_cof >= 0.9):
+            if(similarity_cof >= 0.9999):
+                print(similarity_cof)
                 similar_articles.append(item.id)
 
         article.similar_articles = json.dumps(similar_articles) 
