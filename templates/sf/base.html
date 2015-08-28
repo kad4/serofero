@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-
 {% load staticfiles %}
-
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -51,9 +49,9 @@
                         <div class="header_top">
                             <div class="header_top_left">
                                 <ul class="top_nav">
-                                    <li><a href="#">Home</a></li>
+                                    <li><a href="{% url 'index' %}">Home</a></li>
                                     <li><a href="#">About</a></li>
-                                    <li><a href="">Contact</a></li>
+                                    <li><a href="#">Contact</a></li>
                                 </ul>
                             </div>
 
@@ -72,7 +70,7 @@
                                 <!-- <a class="logo" href="index.html"><img src="img/logo.jpg" alt="logo"></a> -->
 
                                 <!-- for text logo -->
-                                <a class="logo" href="#">Sero<strong>fero</strong> <span>Nepali News Aggregator</span></a> 
+                                <a class="logo" href="{% url 'index' %}">Sero<strong>fero</strong> <span>Nepali News Aggregator</span></a> 
                             </div>
 
                             <div class="header_bottom_right">

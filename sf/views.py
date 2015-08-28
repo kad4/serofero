@@ -48,6 +48,9 @@ def index(request):
 def category(request, category = 'news'):
     articles = Article.objects.filter(category = category).order_by('-pub_date')
 
+    for i,__ in enumerate(articles):
+        articles[i].content = articles[i].content[:300]
+
     content_dict = {
             'category_name' : category,
             'articles' : articles,

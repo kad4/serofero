@@ -25,7 +25,9 @@
 		    	<ul class="fashion_catgnav">
 		      		<li>
 			        	<div class="catgimg2_container">
-			          		<a href="{{ article.url }}"><img alt="img" src="{{ article.image.url }}"></a>
+			        		{% if article.image %}
+			          			<a href="{{ article.url }}"><img alt="img" src="{{ article.image.url }}"></a>
+			          		{% endif %}
 			        	</div>
 
 			        	<h2 class="catg_titile"><a href="{{ article.url }}">{{ article.title }}</a></h2>

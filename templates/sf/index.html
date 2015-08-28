@@ -1,5 +1,4 @@
 {% extends 'sf/base.html' %}
-
 {% load staticfiles %}
 
 {% block content %}
@@ -9,7 +8,7 @@
 	  	<h2>                  
 	    	<span class="bold_line"><span></span></span>
 	    	<span class="solid_line"></span>
-	        <a class="title_text" href="#">News</a>
+	        <a class="title_text" href="{% url 'category' 'news' %}">News</a>
 	  	</h2>
 
 	    <div class="business_category_left wow fadeInDown">
@@ -44,11 +43,11 @@
 	            <li>
 	                <div class="media wow fadeInDown">
 	                    {% if article.image %}
-                            <a class="media-left" href="single.html"><img src="{{ article.image.url }}" alt="img"></a>
+                            <a class="media-left" href="{{ article.url }}"><img src="{{ article.image.url }}" alt="img"></a>
                         {% endif %}
 
 	                    <div class="media-body">
-	                        <h4 class="media-heading"><a href="#">{{ article.title }}</a></h4> 
+	                        <h4 class="media-heading"><a href="{{ article.url }}">{{ article.title }}</a></h4> 
 
 	                        <div class="comments_box">
 	                        	<span class="meta_date">14/12/2013</span>
@@ -68,7 +67,7 @@
 	        	<h2>                  
 	                <span class="bold_line"><span></span></span>
 	                <span class="solid_line"></span>
-	                <a class="title_text" href="#">Politics</a>
+	                <a class="title_text" href="{% url 'category' 'politics' %}">Politics</a>
 	          	</h2>
 
 	          	<ul class="fashion_catgnav wow fadeInDown">
@@ -119,7 +118,7 @@
 	            	<h2>                  
 	                    <span class="bold_line"><span></span></span>
 	                    <span class="solid_line"></span>
-	                    <a class="title_text" href="category-archive.html">Business</a>
+	                    <a class="title_text" href="{% url 'category' 'business'%}">Business</a>
 	            	</h2>
 
 	                <ul class="fashion_catgnav wow fadeInDown">
@@ -173,7 +172,7 @@
 	        <h2>                  
 	          	<span class="bold_line"><span></span></span>
 	          	<span class="solid_line"></span>
-	          	<a class="title_text" href="#">Sports</a>
+	          	<a class="title_text" href="{% url 'category' 'sports' %}">Sports</a>
 	        </h2>
 
 	        <div class="business_category_left">
@@ -233,7 +232,7 @@
 	        	<h2>                  
 	                <span class="bold_line"><span></span></span>
 	                <span class="solid_line"></span>
-	                <a class="title_text" href="#">Entertainment</a>
+	                <a class="title_text" href="{% url 'category' 'news' %}">Entertainment</a>
 	          	</h2>
 
 	          	<ul class="fashion_catgnav wow fadeInDown">
