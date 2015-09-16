@@ -1,11 +1,12 @@
-from django.http import HttpResponse
-from django.shortcuts import render,get_object_or_404
+from django.shortcuts import render
 
 from sf.models import Article
 
+
 def get_articles(category):
-    articles = Article.objects.filter(category = category).order_by('-pub_date')
-    
+    articles = Article.objects.filter(category=category)\
+        .order_by('-pub_date')
+
     if(len(articles) == 0):
         return([], None)
 
@@ -17,6 +18,7 @@ def get_articles(category):
 
     return(articles, first_article)
 
+
 def index(request):
     news, news_first = get_articles('news')
     sports, sports_first = get_articles('sports')
@@ -25,34 +27,35 @@ def index(request):
     entertain, entertain_first = get_articles('entertainment')
 
     content_dict = {
-        'news' : news,
-        'news_first' : news_first,
+        'news': news,
+        'news_first': news_first,
 
-        'politics' : politics,
-        'politics_first' : politics_first,
+        'politics': politics,
+        'politics_first': politics_first,
 
-        'business' : business,
-        'business_first' : business_first,
+        'business': business,
+        'business_first': business_first,
 
-        'sports' : sports,
-        'sports_first' : sports_first,
+        'sports': sports,
+        'sports_first': sports_first,
 
-        'entertain' : entertain,
-        'entertain_first' : entertain_first,
+        'entertain': entertain,
+        'entertain_first': entertain_first,
 
-        'popular' : news,
+        'popular': news,
     }
 
     return render(request, 'sf/index.html', content_dict)
 
-def category(request, category = 'news'):
-    articles = Article.objects.filter(category = category).order_by('-pub_date')
 
-    for i,__ in enumerate(articles):
+def category(request, category='news'):
+    articles = Article.objects.filter(category=category).order_by('-pub_date')
+
+    for i, __ in enumerate(articles):
         articles[i].content = articles[i].content[:300]
 
     content_dict = {
-            'category_name' : category,
-            'articles' : articles,
+        'category_name': category,
+        'articles': articles,
     }
     return render(request, 'sf/category.html', content_dict)
