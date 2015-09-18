@@ -18,7 +18,7 @@ class RSSParser():
             }
 
             r = requests.get(url, headers=headers)
-            # r.encoding = 'utf-8'
+            r.encoding = 'utf-8'
             content = r.text
 
             soup = BeautifulSoup(content, 'xml')
