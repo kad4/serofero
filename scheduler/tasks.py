@@ -16,7 +16,7 @@ from NepClassifier.NepClassifier import TfidfVectorizer
 def obtain_articles():
     urls = [
         'http://www.onlinekhabar.com/rss',
-        # 'http://www.setopati.com/rss',
+        'http://www.setopati.com/rss',
         # 'http://www.ratopati.com/rss',
     ]
 
@@ -60,13 +60,13 @@ def obtain_articles():
     vectorizer = TfidfVectorizer(max_stems=10000)
     vectorizer.load_corpus_info()
 
-    # Find alternative
-    articles = Article.objects.all()
-    new_articles = Article.objects.filter(similar_articles='')
+    new_articles = Article.objects.filter(similar_articles='[]')
 
     for article in new_articles:
         article_vector = vectorizer.tf_idf_vector(article.content)
         similar_articles = []
+
+        articles = Article.objects.filter(category=article.category)
 
         for item in articles:
             if(item.id == article.id):

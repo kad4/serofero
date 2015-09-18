@@ -1,5 +1,7 @@
-from django.shortcuts import render
+import json
 
+from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
 from sf.models import Article
 
 
@@ -20,29 +22,30 @@ def get_articles(category):
 
 
 def index(request):
-    news, news_first = get_articles('news')
-    sports, sports_first = get_articles('sports')
-    politics, politics_first = get_articles('politics')
-    business, business_first = get_articles('business')
-    entertain, entertain_first = get_articles('entertainment')
+    articles = Article.objects.all().order_by('-pub_date')[:20]
+
+    for i, article in enumerate(articles):
+        articles[i].content = articles[i].content[:300]
+
+        articles_list = []
+        ids = json.loads(article.similar_articles)[:3]
+
+        for id in ids:
+            try:
+                similar_article = Article.objects.get(pk=id)
+                articles_list.append(similar_article)
+            except ObjectDoesNotExist:
+                pass
+
+        articles[i].articles_list = articles_list
+
+    first_article = articles[0]
+    articles = articles[1:]
 
     content_dict = {
-        'news': news,
-        'news_first': news_first,
-
-        'politics': politics,
-        'politics_first': politics_first,
-
-        'business': business,
-        'business_first': business_first,
-
-        'sports': sports,
-        'sports_first': sports_first,
-
-        'entertain': entertain,
-        'entertain_first': entertain_first,
-
-        'popular': news,
+        'articles': articles,
+        'first_article': first_article,
+        'popular': articles[:5]
     }
 
     return render(request, 'sf/index.html', content_dict)
