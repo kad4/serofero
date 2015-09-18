@@ -17,10 +17,10 @@ class Article(models.Model):
     pub_date = models.DateTimeField(auto_now_add=True)
 
     category = models.CharField(max_length=20)
-    similar_articles = models.TextField()
+    similar_articles = models.TextField(default='[]')
 
     img_url = models.URLField(default='')
-    image = models.ImageField(upload_to='articles')
+    image = models.ImageField(upload_to='articles', blank=True)
 
     def __str__(self):
         return self.title
@@ -41,3 +41,9 @@ class Article(models.Model):
         img_temp.flush()
 
         self.image.save(file_name, File(img_temp))
+
+    def save(self, *args, **kwargs):
+        # Download image
+        self.get_remote_img()
+
+        super(Article, self).save(*args, **kwargs)
