@@ -3,13 +3,15 @@ from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
 
-def get_article(url, img = False):
+
+def get_article(url, img=False):
     try:
         response = requests.get(url)
         user_agent = {
-            'User-agent' : 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'
+            'User-agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0)'
+            + ' Gecko/20100101 Firefox/36.0'
         }
-        response  = requests.get(url, headers = user_agent)
+        response = requests.get(url, headers=user_agent)
         response.encoding = 'utf-8'
         response.raise_for_status()
     except requests.exceptions.ConnectionError:
@@ -27,56 +29,13 @@ def get_article(url, img = False):
 
         # Format to use
         if(parsedURL.netloc == 'www.onlinekhabar.com'):
-            soup=soup.find('div', id = 'sing_left')
-            soup.find('div', id = 'comments').decompose()
+            soup = soup.find('div', id='sing_left')
+            soup.find('div', id='comments').decompose()
             paragraphs = soup.find_all('p')
 
-            content=''.join([
-                item.string 
-                for item in paragraphs 
-                if item.string
-            ])
-            
-            # Extracting images
-            if(img):
-                img_tag = soup.find('img')
-                if(img_tag):
-                    img_url=img_tag['src']
-
-        elif(parsedURL.netloc == 'www.ekantipur.com'):
-            soup = soup.find('div', class_ = 'newsContentWrapper')
-            paragraphs = soup.find_all('p')
-            
             content = ''.join([
-                item.string 
-                for item in paragraphs 
-                if item.string
-            ])
-        
-        elif(parsedURL.netloc == 'setopati.com'):
-           soup = soup.find('div', id = 'newsbox')
-           soup.find('div', class_ = 'fb_like_detail').decompose()
-           soup.find('div', class_ = 'comments').decompose()
-           paragraphs = soup.find_all('div')+soup.find_all('p')
-
-           content = ''.join([
-                item.string 
-                for item in paragraphs 
-                if item.string
-            ])
-        
-        elif(parsedURL.netloc == 'www.nagariknews.com'):
-           soup = soup.find('div', class_ = "itemFullText")
-
-           content = soup.get_text()
-
-        elif(parsedURL.netloc == 'www.ratopati.com'):
-            soup = soup.find('div',id='sing_cont')
-            paragraphs = soup.find_all('p')
-
-            content=''.join([
-                item.string 
-                for item in paragraphs 
+                item.string
+                for item in paragraphs
                 if item.string
             ])
 
@@ -86,8 +45,51 @@ def get_article(url, img = False):
                 if(img_tag):
                     img_url = img_tag['src']
 
-        elif(parsedURL.netloc ==  'www.ujyaaloonline.com'):
-            soup = soup.find('div', class_ = "detailbox")
+        elif(parsedURL.netloc == 'www.ekantipur.com'):
+            soup = soup.find('div', class_='newsContentWrapper')
+            paragraphs = soup.find_all('p')
+
+            content = ''.join([
+                item.string
+                for item in paragraphs
+                if item.string
+            ])
+
+        elif(parsedURL.netloc == 'setopati.com'):
+            soup = soup.find('div', id='newsbox')
+            soup.find('div', class_='fb_like_detail').decompose()
+            soup.find('div', class_='comments').decompose()
+            paragraphs = soup.find_all('div')+soup.find_all('p')
+
+            content = ''.join([
+                item.string
+                for item in paragraphs
+                if item.string
+            ])
+
+        elif(parsedURL.netloc == 'www.nagariknews.com'):
+            soup = soup.find('div', class_="itemFullText")
+
+            content = soup.get_text()
+
+        elif(parsedURL.netloc == 'www.ratopati.com'):
+            soup = soup.find('div', id='sing_cont')
+            paragraphs = soup.find_all('p')
+
+            content = ''.join([
+                item.string
+                for item in paragraphs
+                if item.string
+            ])
+
+            # Extracting images
+            if(img):
+                img_tag = soup.find('img')
+                if(img_tag):
+                    img_url = img_tag['src']
+
+        elif(parsedURL.netloc == 'www.ujyaaloonline.com'):
+            soup = soup.find('div', class_="detailbox")
 
             paragraphs = soup.find_all('p')
 
@@ -102,8 +104,10 @@ def get_article(url, img = False):
         else:
             print('Match for the site not found')
 
-        return([content,img_url])
+        return([content, img_url])
 
 if __name__ == '__main__':
-    print(get_article('http://www.ujyaaloonline.com/news/44540/most-valuable-brand/',img = False))
-
+    print(get_article(
+        'http://www.ujyaaloonline.com/news/44540/most-valuable-brand/',
+        img=False
+    ))
