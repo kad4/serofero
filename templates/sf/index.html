@@ -4,286 +4,90 @@
 {% block content %}
 <!-- start content bottom left -->
 <div class="content_bottom_left">
-	<div class="single_category wow fadeInDown">
-	  	<h2>                  
-	    	<span class="bold_line"><span></span></span>
-	    	<span class="solid_line"></span>
-	        <a class="title_text" href="{% url 'category' 'news' %}">News</a>
-	  	</h2>
 
-	    <div class="business_category_left wow fadeInDown">
-	        <ul class="fashion_catgnav">
-	          	<li>
-	                <div class="catgimg2_container">
-	                	{% if news_first.image %}
-                            <a href="{{ news_first.url }}"><img alt="img" src="{{ news_first.image.url}}"></a>
-                        {% endif %}
-	                </div>
+    <div style="visibility: visible; animation-name: fadeInDown;" class="single_category wow fadeInDown animated">
+      <h2>                  
+        <span class="bold_line"><span></span></span>
+        <span class="solid_line"></span>
+      </h2>
 
-	                <h2 class="catg_titile">
-	                	<a href="{{ news_first.url }}">{{ news_first.title }}</a>
-	                </h2>
+      <div style="visibility: visible; animation-name: fadeInDown;" class="wow fadeInDown animated">
+        <ul class="fashion_catgnav">
+          <li>
+            <div class="catgimg2_container">
+                {% if article.image %}
+                    <a href="{{ first_article.url }}">
+                        <img alt="img" src="{{ first_article.image.url }}" style="width:auto;">
+                    </a>
+                {% else %}
+                    <a href="{{ first_article.url }}">
+                        <img alt="img" src="{% static 'sf/img/placeholder.jpg' %}" style="width:auto;">
+                    </a>
+                {% endif %}
+            </div>
 
-	                <div class="comments_box">
-	                  	<span class="meta_date">14/12/2013</span>
-	                  	<span class="meta_comment"><a href="#">No Comments</a></span>
-	                  	<span class="meta_more">
-	                  		<a  href="{{ news_first.url }}">Read More...</a>
-	                  	</span>
-	                </div>
+            <h2 class="catg_titile"><a href="{{ first_article.url }}">{{first_article.title}}</a></h2>
 
-	                <p>{{ news_first.content }}</p>
-	          	</li>
-	        </ul>
-	    </div>  
+            <div class="comments_box">
+              <span class="meta_date">14/12/2013</span>
+              <span class="meta_comment"><a href="#">No Comments</a></span>
+              <span class="meta_more"><a href="#">Read More...</a></span>
+            </div>
+            <p style="clear:both;">{{first_article.content}}</p>
+          </li>
+        </ul>
+      </div>  
 
-	    <div class="business_category_right wow fadeInDown">
-	        <ul class="small_catg">
-	        	{% for article in news %}
-	            <li>
-	                <div class="media wow fadeInDown">
-	                    {% if article.image %}
-                            <a class="media-left" href="{{ article.url }}"><img src="{{ article.image.url }}" alt="img"></a>
-                        {% endif %}
+    </div>
+    
+    <div class="single_category">
+        {% for article in articles %}
+            <div class="media">
+                {% if article.image %}
+                    <a class="media-left" href="#"><img src="{{ article.image.url }}" alt="img" "height:auto;"></a>
+                {% else %}
+                    <a class="media-left" href="{{ article.url }}" target="_blank"><img alt="img" src="{% static 'sf/img/placeholder.jpg' %}"></a>
+                {% endif %}
 
-	                    <div class="media-body">
-	                        <h4 class="media-heading"><a href="{{ article.url }}">{{ article.title }}</a></h4> 
+                <div class="media-body">
+                    <h3 class="heading"><a href="{{ article.url }}">{{ article.title }}</a></h3>
 
-	                        <div class="comments_box">
-	                        	<span class="meta_date">14/12/2013</span>
-	                        	<span class="meta_comment"><a href="#">No Comments</a></span>
-	                        </div>
-	                    </div>
-	                </div>
-	            </li>
-	            {% endfor %}
-	        </ul>
-	    </div>   
-	</div>
+                    <div class="comments_box">
+                        <span class="meta_date">14/12/2013</span>
+                        <span class="meta_comment">
+                            <a href="#">No Comments</a>
+                        </span>
+                        <p>{{ article.content }}</p>
+                    </div>
 
-	<div class="games_fashion_area">
-	  	<div class="games_category">
-	        <div class="single_category">
-	        	<h2>                  
-	                <span class="bold_line"><span></span></span>
-	                <span class="solid_line"></span>
-	                <a class="title_text" href="{% url 'category' 'politics' %}">Politics</a>
-	          	</h2>
-
-	          	<ul class="fashion_catgnav wow fadeInDown">
-	                <li>
-	                    <div class="catgimg2_container">
-                            {% if politics_first.image %}
-                                <a href="{{ politics_first.url }}"><img alt="img" src="{{ politics_first.image.url }}"></a>
-                            {% endif %}
-	                    </div>
-
-	                    <h2 class="catg_titile"><a href="{{ politics_first.url }}">{{ politics_first.title }}</a></h2>
-
-	                    <div class="comments_box">
-	                        <span class="meta_date">14/12/2013</span>
-	                        <span class="meta_comment"><a href="#">No Comments</a></span>
-	                        <span class="meta_more"><a href="#">Read More...</a></span>
-	                    </div>
-	                    <p>{{ politics_first.content }}</p>
-	                </li>
-	          	</ul>
-
-	          	<ul class="small_catg wow fadeInDown">
-	                {% for article in politics %}
-	                <li>
-	                    <div class="media">
-	                        {% if article.image %}
-                                <a class="media-left" href="#"><img src="{{ article.image.url }}" alt="img"></a>
-                            {% endif %}
-
-	                        <div class="media-body">
-	                            <h4 class="media-heading"><a href="{{ article.url }}">{{ article.title }}</a></h4>
-
-	                            <div class="comments_box">
-	                                <span class="meta_date">14/12/2013</span>
-	                                <span class="meta_comment"><a href="#">No Comments</a></span>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </li>
-	                {% endfor %}
-	          	</ul>
-	        </div>
-		</div>
-
-	   <div class="fashion_category">
-	    	<div class="single_category">
-	      		<div class="single_category wow fadeInDown">
-	            	<h2>                  
-	                    <span class="bold_line"><span></span></span>
-	                    <span class="solid_line"></span>
-	                    <a class="title_text" href="{% url 'category' 'business'%}">Business</a>
-	            	</h2>
-
-	                <ul class="fashion_catgnav wow fadeInDown">
-	                  	<li>
-	                        <div class="catgimg2_container">
-	                        	{% if business_first.image %}
-                                    <a href="{{ business_first.url }}"><img alt="img" src="{{ business_first.image.url }}"></a>
+                    {% if article.articles_list %}
+                    <div class="similar_post">
+                      <h2>Similar Articles</h2>
+                      <ul style="visibility: visible; animation-name: fadeInDown;" class="small_catg similar_nav wow fadeInDown animated animated">
+                        {% for sim_article in article.articles_list %}
+                          <li>
+                            <div class="media wow fadeInDown animated animated" style="visibility: visible; animation-name: fadeInDown;">
+                                <a class="media-left related-img" href="{{sim_article.url}}">
+                                {% if sim_article.image %}
+                                    <img src="{{ sim_article.image.url }}" alt="img">
+                                {% else %}
+                                    <img src="{% static 'sf/img/placeholder.jpg' %}" alt="img">
                                 {% endif %}
-	                        </div>
-
-	                        <h2 class="catg_titile"><a href="{{ business_first.url }}">{{ business_first.title }}</a></h2>
-
-	                        <div class="comments_box">
-	                        	<span class="meta_date">14/12/2013</span>
-	                          	<span class="meta_comment"><a href="#">No Comments</a></span>
-	                          	<span class="meta_more"><a  href="#">Read More...</a></span>
-	                        </div>
-
-	                        <p>{{ business_first.content }}</p>
-	                  	</li>
-	                </ul>
-
-	            	<ul class="small_catg wow fadeInDown">
-	                  	{% for article in business %}
-	                  	<li>
-	                        <div class="media wow fadeInDown">
-	                          	{% if article.image %}
-                                    <a class="media-left" href="{{ article.url }}"><img src="{{ article.image.url }}" alt="img"></a>
-                                {% endif %}
-
-	                          	<div class="media-body">
-	                                <h4 class="media-heading">
-	                                	<a href="{{ article.url }}">{{ article.title }}</a>
-	                                </h4>
-	                                <div class="comments_box">
-	                                	<span class="meta_date">14/12/2013</span>
-	                                  	<span class="meta_comment"><a href="#">No Comments</a></span>
-	                                </div>
-	                          	</div>
-	                        </div>
-	                  	</li>
-	                  	{% endfor %}
-	            	</ul>
-	      		</div>
-	    	</div>
-	  	</div>
-	</div>
-
-	<div class="technology_catrarea">
-	  	<div class="single_category">
-	        <h2>                  
-	          	<span class="bold_line"><span></span></span>
-	          	<span class="solid_line"></span>
-	          	<a class="title_text" href="{% url 'category' 'sports' %}">Sports</a>
-	        </h2>
-
-	        <div class="business_category_left">
-	          	<ul class="fashion_catgnav wow fadeInDown">
-	            	<li>
-	              		<div class="catgimg2_container">
-	                		<a href="#">
-	                			{% if sports_first.image %}
-                                    <img alt="img" src="{{ sports_first.image.url }}">
-                                {% endif %}
-	                		</a>
-	              		</div>
-	              		<h2 class="catg_titile">
-	              			<a href="{{ sports_first.url }}">{{ sports_first.title }}</a>
-	              		</h2>
-	              		<div class="comments_box">
-	                		<span class="meta_date">14/12/2013</span>
-	                		<span class="meta_comment"><a href="#">No Comments</a></span>
-	                		<span class="meta_more"><a  href="#">Read More...</a></span>
-	              		</div>
-	              		<p>{{ sports_first.content }}</p>
-	            	</li>
-	          	</ul>
-	        </div>  
-
-	    	<div class="business_category_right">
-	      		<ul class="small_catg wow fadeInDown">
-	      			{% for article in sports %}
-	        		<li>
-	          			<div class="media wow fadeInDown">
-	            			<a class="media-left" href="{{ article.url }}">
-	              				{% if article.image %}
-                                    <img src="{{ article.image.url }}" alt="img">
-                                {% endif %}
-	            			</a>
-	            			<div class="media-body">
-	                  			<h4 class="media-heading">
-	                  				<a href="{{ article.url }}">{{ article.title }}</a>
-	                  			</h4> 
-	                  			<div class="comments_box">
-	                    			<span class="meta_date">14/12/2013</span>
-	                    			<span class="meta_comment"><a href="#">No Comments</a></span>
-	                  			</div>
-	            			</div>
-	          			</div>
-	        		</li>
-	        		{% endfor %}
-	      		</ul>
-	    	</div>
-
-	  	</div>
-	</div>
-
-	<div class="games_fashion_area">
-	  	<div class="games_category">
-	        <div class="single_category">
-	        	<h2>                  
-	                <span class="bold_line"><span></span></span>
-	                <span class="solid_line"></span>
-	                <a class="title_text" href="{% url 'category' 'news' %}">Entertainment</a>
-	          	</h2>
-
-	          	<ul class="fashion_catgnav wow fadeInDown">
-	                <li>
-	                    <div class="catgimg2_container">
-	                    <a href="{{ entertain_first.url }}">
-                            {% if entertain_first.image %}
-	                        	<img alt="img" src="{{ entertain_first.image.url }}">
-                            {% endif %}
-	                    </a>
-	                    </div>
-
-	                    <h2 class="catg_titile">
-	                        <a href="{{ entertain_first.url }}">{{ entertain_first.title }}</a>
-	                    </h2>
-
-	                    <div class="comments_box">
-	                        <span class="meta_date">14/12/2013</span>
-	                        <span class="meta_comment"><a href="#">No Comments</a></span>
-	                        <span class="meta_more"><a  href="#">Read More...</a></span>
-	                    </div>
-	                    <p>{{ entertain_first.content }}</p>
-	                </li>
-	          	</ul>
-
-	          	<ul class="small_catg wow fadeInDown">
-	                {% for article in entertain %}
-	                <li>
-	                    <div class="media">
-	                        <a class="media-left" href="#">
-                                {% if article.image %}
-                                    <img src="{{ article.image.url }}" alt="img">
-                                {% endif %}
-	                        </a>
-	                        <div class="media-body">
-	                            <h4 class="media-heading">
-	                                <a href="{{ article.url }}">{{ article.title }}</a>
-	                            </h4>
-
-	                            <div class="comments_box">
-	                                <span class="meta_date">14/12/2013</span>
-	                                <span class="meta_comment"><a href="#">No Comments</a></span>
-	                            </div>
-	                        </div>
-	                    </div>
-	                </li>
-	                {% endfor %}
-	          	</ul>
-	        </div>
-		</div>
-	</div>
+                              </a>
+                              <div class="media-body">
+                                  <h4 class="media-heading"><a href="{{sim_article.url}}">{{sim_article.title}}</a></h4> 
+                              </div>
+                            </div>
+                          </li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
 
@@ -309,4 +113,8 @@
 	  	</ul>
 	</div> <!-- End single bottom rightbar -->
 </div>
+{% endblock %}
+
+
+{% block extrajs %}
 {% endblock %}
