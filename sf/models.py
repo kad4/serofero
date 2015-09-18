@@ -10,7 +10,7 @@ import requests
 class Article(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=80)
-    content = models.TextField(max_length=305)
+    content = models.TextField()
 
     url = models.URLField()
     views = models.IntegerField(default=0)
@@ -19,7 +19,7 @@ class Article(models.Model):
     category = models.CharField(max_length=20)
     similar_articles = models.TextField(default='[]')
 
-    img_url = models.URLField(default='')
+    img_url = models.URLField(default='', blank=True)
     image = models.ImageField(upload_to='articles', blank=True)
 
     def __str__(self):
@@ -42,8 +42,8 @@ class Article(models.Model):
 
         self.image.save(file_name, File(img_temp))
 
-    def save(self, *args, **kwargs):
-        # Download image
-        self.get_remote_img()
-
-        super(Article, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     # Download image
+    #     self.get_remote_img()
+    #
+    #     super(Article, self).save(*args, **kwargs)
