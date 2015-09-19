@@ -31,7 +31,7 @@
                             </a>
 			          		{% else %}
                             <a href="{{ article.url }}">
-                                <img alt="img" src="{% static 'sf/img/placeholder.jpg' %}" style="width:auto;">
+                                <img alt="img" src="https://placeholdit.imgix.net/~text?txtsize=42&txt=Serofero&w=450&h=200&txttrack=0" style="">
                             </a>
                             {% endif %}
 			        	</div>
@@ -45,6 +45,31 @@
 			        	</div>
 
                         <p style="clear:both;">{{ article.content }}</p>
+
+                        {% if article.articles_list %}
+                        <div class="similar_post">
+                            <h2>Similar Articles</h2>
+                            <ul style="visibility: visible; animation-name: fadeInDown;" class="small_catg similar_nav wow fadeInDown animated animated">
+                                {% for sim_article in article.articles_list %}
+                                <li>
+                                    <div class="media wow fadeInDown animated animated" style="visibility: visible; animation-name: fadeInDown;">
+                                        <a class="media-left related-img" href="{{sim_article.url}}">
+                                            {% if sim_article.image %}
+                                            <img src="{{ sim_article.image.url }}" alt="img">
+                                            {% else %}
+                                            <img src="https://placeholdit.imgix.net/~text?txtsize=42&txt=serofero&w=450&h=450&txttrack=0" alt="img">
+                                            {% endif %}
+                                        </a>
+                                        <div class="media-body">
+                                            <h4 class="media-heading"><a href="{{sim_article.url}}">{{sim_article.title}}</a></h4> 
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
 		      		</li>
 		    	</ul>
 		  	</div>

@@ -14,14 +14,14 @@
       <div style="visibility: visible; animation-name: fadeInDown;" class="wow fadeInDown animated">
         <ul class="fashion_catgnav">
           <li>
-            <div class="catgimg2_container">
+              <div class="catgimg2_container" style="height:auto;">
                 {% if article.image %}
                     <a href="{{ first_article.url }}">
-                        <img alt="img" src="{{ first_article.image.url }}" style="width:auto;">
+                        <img alt="img" src="{{ first_article.image.url }}" style="height:auto;">
                     </a>
                 {% else %}
                     <a href="{{ first_article.url }}">
-                        <img alt="img" src="{% static 'sf/img/placeholder.jpg' %}" style="width:auto;">
+                        <img alt="img" src="https://placeholdit.imgix.net/~text?txtsize=42&txt=Serofero&w=450&h=200&txttrack=0" style="height:auto;">
                     </a>
                 {% endif %}
             </div>
@@ -46,7 +46,9 @@
                 {% if article.image %}
                     <a class="media-left" href="#"><img src="{{ article.image.url }}" alt="img" "height:auto;"></a>
                 {% else %}
-                    <a class="media-left" href="{{ article.url }}" target="_blank"><img alt="img" src="{% static 'sf/img/placeholder.jpg' %}"></a>
+                    <a class="media-left" href="{{ article.url }}" target="_blank">
+                        <img alt="img" src="https://placeholdit.imgix.net/~text?txtsize=42&txt=Serofero&w=450&h=200&txttrack=0">
+                    </a>
                 {% endif %}
 
                 <div class="media-body">
@@ -62,31 +64,31 @@
 
                     {% if article.articles_list %}
                     <div class="similar_post">
-                      <h2>Similar Articles</h2>
-                      <ul style="visibility: visible; animation-name: fadeInDown;" class="small_catg similar_nav wow fadeInDown animated animated">
-                        {% for sim_article in article.articles_list %}
-                          <li>
-                            <div class="media wow fadeInDown animated animated" style="visibility: visible; animation-name: fadeInDown;">
-                                <a class="media-left related-img" href="{{sim_article.url}}">
-                                {% if sim_article.image %}
-                                    <img src="{{ sim_article.image.url }}" alt="img">
-                                {% else %}
-                                    <img src="{% static 'sf/img/placeholder.jpg' %}" alt="img">
-                                {% endif %}
-                              </a>
-                              <div class="media-body">
-                                  <h4 class="media-heading"><a href="{{sim_article.url}}">{{sim_article.title}}</a></h4> 
-                              </div>
-                            </div>
-                          </li>
-                        {% endfor %}
+                        <h2>Similar Articles</h2>
+                        <ul style="visibility: visible; animation-name: fadeInDown;" class="small_catg similar_nav wow fadeInDown animated animated">
+                            {% for sim_article in article.articles_list %}
+                            <li>
+                                <div class="media wow fadeInDown animated animated" style="visibility: visible; animation-name: fadeInDown;">
+                                    <a class="media-left related-img" href="{{sim_article.url}}">
+                                        {% if sim_article.image %}
+                                        <img src="{{ sim_article.image.url }}" alt="img">
+                                        {% else %}
+                                        <img src="https://placeholdit.imgix.net/~text?txtsize=42&txt=serofero&w=450&h=450&txttrack=0" alt="img">
+                                        {% endif %}
+                                    </a>
+                                    <div class="media-body">
+                                        <h4 class="media-heading"><a href="{{sim_article.url}}">{{sim_article.title}}</a></h4> 
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
                         </ul>
                     </div>
                     {% endif %}
                 </div>
             </div>
             <hr>
-        {% endfor %}
+            {% endfor %}
     </div>
 </div>
 {% endblock %}
