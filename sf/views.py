@@ -22,7 +22,7 @@ def get_articles(category):
 
 
 def index(request):
-    articles = Article.objects.all().order_by('-pub_date')[:30]
+    articles = Article.objects.all().order_by('-pub_date').order_by('-image')[:30]
 
     for i, article in enumerate(articles):
         articles[i].content = articles[i].content[:300]
