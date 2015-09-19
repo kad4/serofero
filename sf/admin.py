@@ -3,6 +3,15 @@ from .models import Article
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'category', 'content', 'url', 'views', 'similar_articles')
+    list_display = (
+        'id', 
+        'title',
+        'category',
+        'content',
+        'url',
+        'views',
+        'similar_articles',
+        'img_url'
+    )
 
-admin.site.register(Article,ArticleAdmin)
+admin.site.register(Article, ArticleAdmin)
