@@ -67,6 +67,11 @@ def get_article(url, img=False):
                 if item.string
             ])
 
+            if(img):
+                img_tag = soup.find('img')
+                if(img_tag):
+                    img_url = 'http://setopati.com/' + img_tag['src']
+
         elif(parsedURL.netloc == 'www.nagariknews.com'):
             soup = soup.find('div', class_="itemFullText")
 
