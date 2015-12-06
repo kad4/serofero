@@ -1,0 +1,3 @@
+[submodule "NepClassifier"]
+	path = NepClassifier
+	url = git@github.com:diwasblack/NepClassifier.git
